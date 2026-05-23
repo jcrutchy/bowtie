@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bowtie Risk Assessment Tool</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  --sb-bg:#0c0f1a;
+  --sb-surface:#141824;
+  --sb-surface2:#1c2030;
+  --sb-border:#252a3a;
+  --sb-border2:#2f3650;
+  --sb-text:#e4e8f7;
+  --sb-muted:#6b7494;
+  --sb-accent:#5b8ef0;
+  --sb-accent-h:#4a7be0;
+  --sb-danger:#e05454;
+  --canvas-bg:#f2f0eb;
+  --dot-color:#ccc8c0;
+}
+
+body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:flex;height:100vh;overflow:hidden;background:var(--canvas-bg)}
+
+/* ── SIDEBAR ─────────────────────────────────────────── */
+#sidebar{
+  width:320px;flex-shrink:0;
+  background:var(--sb-bg);
+  border-right:1px solid var(--sb-border);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  z-index:10;
+  box-shadow:4px 0 24px rgba(0,0,0,0.28);
+}
+
+#sidebar-header{
+  padding:18px 20px 16px;
+  border-bottom:1px solid var(--sb-border);
+  flex-shrink:0;
+}
+
+.logo-row{display:flex;align-items:center;gap:9px;margin-bottom:4px}
+.logo-icon{
+  width:28px;height:28px;border-radius:6px;
+  background:linear-gradient(135deg,#4a7be0,#7c5ce4);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:white;font-weight:700;flex-shrink:0;
+}
+.logo-title{font-size:14px;font-weight:700;color:var(--sb-text);letter-spacing:-0.01em}
+.logo-sub{font-size:11px;color:var(--sb-muted);margin-top:2px;line-height:1.4}
+
+#sidebar-scroll{flex:1;overflow-y:auto;padding:14px 16px}
+#sidebar-scroll::-webkit-scrollbar{width:3px}
+#sidebar-scroll::-webkit-scrollbar-track{background:transparent}
+#sidebar-scroll::-webkit-scrollbar-thumb{background:var(--sb-border2);border-radius:2px}
+
+.section{margin-bottom:18px}
+
+.sec-label{
+  display:flex;align-items:center;gap:7px;
+  font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--sb-muted);margin-bottom:8px;
+}
+.sec-dot{width:7px;height:7px;border-radius:2px;flex-shrink:0}
+
+.field-wrap{position:relative}
+.field-wrap input[type=text]{
+  width:100%;
+  background:var(--sb-surface);
+  border:1px solid var(--sb-border);
+  border-radius:7px;
+  padding:9px 12px;
+  font-size:12.5px;font-family:inherit;
+  color:var(--sb-text);
+  outline:none;
+  transition:border-color 0.15s,background 0.15s;
+}
+.field-wrap input[type=text]:focus{border-color:var(--sb-accent);background:var(--sb-surface2)}
+.field-wrap input[type=text]::placeholder{color:var(--sb-muted)}
+
+.item-list{display:flex;flex-direction:column;gap:5px}
+
+.item-row{display:flex;align-items:center;gap:6px}
+.item-num{
+  min-width:18px;height:18px;
+  border-radius:4px;
+  background:var(--sb-surface2);
+  border:1px solid var(--sb-border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:9.5px;font-weight:700;color:var(--sb-muted);
+  flex-shrink:0;
+}
+.item-row input{
+  flex:1;
+  background:var(--sb-surface);
+  border:1px solid var(--sb-border);
+  border-radius:7px;
+  padding:7px 10px;
+  font-size:12px;font-family:inherit;
+  color:var(--sb-text);
+  outline:none;
+  transition:border-color 0.15s;
+}
+.item-row input:focus{border-color:var(--sb-accent)}
+.item-row input::placeholder{color:var(--sb-muted)}
+
+/* ── META FIELDS ────────────────────────────────────── */
+.meta-row{
+  display:flex;align-items:center;gap:6px;
+  margin:4px 0 0 24px;
+}
+.meta-row.no-indent{margin-left:0;margin-top:5px}
+.meta-label{
+  font-size:10px;color:var(--sb-muted);white-space:nowrap;
+  width:60px;flex-shrink:0;letter-spacing:0.02em;
+}
+.meta-select,.meta-notes{
+  flex:1;
+  background:rgba(20,24,36,0.6);
+  border:1px solid var(--sb-border2);
+  border-radius:5px;
+  padding:4px 7px;
+  font-size:11px;color:var(--sb-text);
+  outline:none;font-family:inherit;
+}
+.meta-select:focus,.meta-notes:focus{border-color:var(--sb-accent)}
+.meta-select option{background:var(--sb-surface2)}
+.meta-notes{font-style:italic}
+.meta-notes::placeholder{color:var(--sb-muted)}
+
+/* ── CONTROLS SUB-LIST ──────────────────────────────── */
+.controls-container{
+  margin:4px 0 12px 24px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.control-row{
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+.control-row input{
+  flex:1;
+  background:rgba(20,24,36,0.6);
+  border:1px solid var(--sb-border2);
+  border-radius:5px;
+  padding:4px 8px;
+  font-size:11px;
+  color:var(--sb-text);
+  outline:none;
+}
+.control-row input:focus{border-color:var(--sb-accent)}
+.btn-add-ctrl{
+  align-self:flex-start;
+  margin-left:24px;
+  margin-bottom:8px;
+  background:transparent;
+  border:none;
+  color:var(--sb-accent);
+  font-size:10.5px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:3px;
+  opacity:0.8;
+}
+.btn-add-ctrl:hover{opacity:1;text-decoration:underline}
+
+.btn-del{
+  width:26px;height:26px;flex-shrink:0;
+  border:none;border-radius:6px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;line-height:1;
+  background:rgba(224,84,84,0.08);color:rgba(224,84,84,0.6);
+  transition:all 0.15s;
+}
+.btn-del:hover{background:rgba(224,84,84,0.18);color:#e05454}
+
+.btn-add{
+  width:100%;margin-top:6px;
+  background:transparent;
+  border:1px dashed var(--sb-border2);
+  border-radius:7px;
+  padding:8px;
+  font-size:11.5px;font-family:inherit;
+  color:var(--sb-muted);
+  cursor:pointer;
+  transition:all 0.15s;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.btn-add:hover{border-color:var(--sb-accent);color:var(--sb-accent);background:rgba(91,142,240,0.04)}
+
+.divider{height:1px;background:var(--sb-border);margin:4px -16px 16px}
+
+#sidebar-footer{
+  padding:12px 16px;
+  border-top:1px solid var(--sb-border);
+  display:flex;flex-direction:column;gap:6px;
+  flex-shrink:0;
+}
+
+.btn-export{
+  width:100%;padding:9px 12px;
+  border-radius:7px;font-size:12px;font-weight:600;font-family:inherit;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:all 0.15s;
+}
+.btn-primary{background:var(--sb-accent);color:white;border:none}
+.btn-primary:hover{background:var(--sb-accent-h)}
+.btn-primary:active{transform:scale(0.98)}
+.btn-ghost{background:var(--sb-surface);color:var(--sb-text);border:1px solid var(--sb-border2)}
+.btn-ghost:hover{background:var(--sb-surface2)}
+.btn-ghost:active{transform:scale(0.98)}
+
+.footer-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+
+/* ── CANVAS ──────────────────────────────────────────── */
+#canvas-area{flex:1;position:relative;overflow:hidden}
+
+#workspace{width:100%;height:100%;cursor:default;display:block}
+#workspace.pan-ready{cursor:grab}
+#workspace.panning{cursor:grabbing}
+
+/* ── ZOOM CONTROLS ───────────────────────────────────── */
+#zoom-panel{
+  position:absolute;bottom:20px;right:20px;
+  background:white;border:1px solid #e2e0da;
+  border-radius:10px;overflow:hidden;
+  box-shadow:0 2px 12px rgba(0,0,0,0.1);
+  display:flex;flex-direction:column;
+}
+.btn-zoom{
+  width:36px;height:36px;border:none;background:white;
+  cursor:pointer;font-size:18px;color:#555;
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.1s;
+  flex-shrink:0;
+}
+.btn-zoom:hover{background:#f3f3f0}
+.btn-zoom:active{background:#e8e8e4}
+.btn-zoom+.btn-zoom{border-top:1px solid #e8e6e0}
+.zoom-label{
+  font-size:9.5px;font-weight:700;color:#999;letter-spacing:0.05em;
+  text-align:center;padding:3px 0 2px;border-top:1px solid #e8e6e0;
+  background:white;font-family:inherit;
+}
+#zoom-pct{font-size:10px;color:#555;font-weight:700}
+
+/* ── HINT ────────────────────────────────────────────── */
+#hint{
+  position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
+  background:rgba(12,15,26,0.72);color:rgba(228,232,247,0.85);
+  font-size:11px;padding:6px 14px;border-radius:20px;
+  pointer-events:none;white-space:nowrap;
+  backdrop-filter:blur(8px);letter-spacing:0.01em;
+}
+
+/* ── STATUS CHIP ─────────────────────────────────────── */
+#status{
+  position:absolute;top:14px;right:14px;
+  background:rgba(255,255,255,0.9);
+  border:1px solid #e2e0da;
+  border-radius:8px;
+  padding:5px 11px;
+  font-size:11px;color:#666;
+  backdrop-filter:blur(4px);
+}
+</style>
+</head>
+<body>
+
+<script id="bowtie-state" type="application/json">
+{
+  "hazard": "Pressurised Gas Cylinder",
+  "topEvent": "Loss of Containment",
+  "topEventLikelihood": "Possible",
+  "topEventNotes": "Based on historical incident data",
+  "threats": [
+    { "label": "Valve Failure", "controls": ["Routine Inspection", "Overpressure Cap"], "likelihood": "Unlikely", "notes": "Monthly inspection regime in place" },
+    { "label": "Operator Error", "controls": ["Staff Training"], "likelihood": "Possible", "notes": "Human factors assessment underway" },
+    { "label": "Corrosion / Degradation", "controls": ["Ultrasonic Testing"], "likelihood": "Rare", "notes": "" },
+    { "label": "Overpressure Event", "controls": ["Burst Disc Setup"], "likelihood": "Rare", "notes": "" }
+  ],
+  "outcomes": [
+    { "label": "Fire or Explosion", "controls": ["Deluge System"], "likelihood": "Unlikely", "severity": "Catastrophic", "notes": "Fatality risk within 50m radius" },
+    { "label": "Toxic Gas Release", "controls": ["Scrubber System", "PPE Zone"], "likelihood": "Possible", "severity": "Major", "notes": "" },
+    { "label": "Environmental Damage", "controls": ["Bund Wall Catchment"], "likelihood": "Likely", "severity": "Moderate", "notes": "" },
+    { "label": "Personnel Injury", "controls": ["Evacuation Plan"], "likelihood": "Unlikely", "severity": "Major", "notes": "" }
+  ]
+}
+</script>
+
+<aside id="sidebar">
+  <div id="sidebar-header">
+    <div class="logo-row">
+      <div class="logo-icon">⬡</div>
+      <div class="logo-title">Bowtie Risk Tool</div>
+    </div>
+    <div class="logo-sub">Visual risk assessment · ISO 31000</div>
+  </div>
+
+  <div id="sidebar-scroll">
+
+    <div class="section">
+      <div class="sec-label">
+        <span class="sec-dot" style="background:#f0d060"></span>Hazard
+      </div>
+      <div class="field-wrap">
+        <input type="text" id="inp-hazard" placeholder="Describe the hazard source…">
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="sec-label">
+        <span class="sec-dot" style="background:#b09ef8"></span>Top Event
+      </div>
+      <div class="field-wrap">
+        <input type="text" id="inp-top-event" placeholder="The undesired top event…">
+      </div>
+      <div class="meta-row no-indent">
+        <span class="meta-label">Likelihood</span>
+        <select class="meta-select" id="sel-te-likelihood"></select>
+      </div>
+      <div class="meta-row no-indent">
+        <span class="meta-label">Notes</span>
+        <input type="text" class="meta-notes" id="inp-te-notes" placeholder="Justification / basis…">
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="sec-label">
+        <span class="sec-dot" style="background:#7ab8f5"></span>Threats &amp; Preventative Controls
+      </div>
+      <div class="item-list" id="threats-list"></div>
+      <button class="btn-add" id="btn-add-threat">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><line x1="6" y1="1" x2="6" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="1" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Add Threat
+      </button>
+    </div>
+
+    <div class="section">
+      <div class="sec-label">
+        <span class="sec-dot" style="background:#f09898"></span>Outcomes &amp; Recovery Controls
+      </div>
+      <div class="item-list" id="outcomes-list"></div>
+      <button class="btn-add" id="btn-add-outcome">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><line x1="6" y1="1" x2="6" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="1" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Add Outcome
+      </button>
+    </div>
+
+  </div>
+
+  <div id="sidebar-footer">
+    <div class="footer-row">
+      <button class="btn-export btn-ghost" id="btn-load-json">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M1 3a1 1 0 011-1h4l1.5 2H13a1 1 0 011 1v6a1 1 0 01-1 1H2a1 1 0 01-1-1V3z" stroke="currentColor" stroke-width="1.4"/></svg>
+        Load Data
+      </button>
+      <button class="btn-export btn-primary" id="btn-png">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3M1 10v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Export PNG
+      </button>
+    </div>
+    <div class="footer-row">
+      <button class="btn-export btn-ghost" id="btn-save-json">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 1h7l3 3v8a1 1 0 01-1 1H2a1 1 0 01-1-1V2a1 1 0 011-1z" stroke="currentColor" stroke-width="1.4"/><circle cx="6.5" cy="9.5" r="1.5" stroke="currentColor" stroke-width="1.2"/></svg>
+        Save Data
+      </button>
+      <button class="btn-export btn-ghost" id="btn-fit">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 4V1h3M9 1h3v3M12 9v3H9M4 12H1V9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="4" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+        Fit View
+      </button>
+    </div>
+  </div>
+</aside>
+
+<main id="canvas-area">
+  <svg id="workspace" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse">
+        <circle cx="1" cy="1" r="0.85" fill="var(--dot-color)" opacity="0.7"/>
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#dots)"/>
+    <g id="world"></g>
+  </svg>
+
+  <div id="zoom-panel">
+    <button class="btn-zoom" id="btn-zi" title="Zoom in">+</button>
+    <button class="btn-zoom" id="btn-zo" title="Zoom out">−</button>
+    <button class="btn-zoom" id="btn-zr" title="Fit view" style="font-size:14px">⊡</button>
+    <div class="zoom-label"><span id="zoom-pct">100%</span></div>
+  </div>
+
+  <div id="status"></div>
+  <div id="hint">Scroll to zoom &nbsp;·&nbsp; Middle-click or Space + drag to pan</div>
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// CONFIGURABLE LISTS — edit these to customise dropdowns
+// ═══════════════════════════════════════════════════════
+const LIKELIHOOD_OPTIONS = ['Rare', 'Unlikely', 'Possible', 'Likely', 'Almost Certain'];
+const SEVERITY_OPTIONS   = ['Negligible', 'Minor', 'Moderate', 'Major', 'Catastrophic'];
+
+// Colours mapped to each option value (customise freely)
+const LIKELIHOOD_COLORS = {
+  'Rare':           '#22c55e',
+  'Unlikely':       '#84cc16',
+  'Possible':       '#eab308',
+  'Likely':         '#f97316',
+  'Almost Certain': '#ef4444'
+};
+const SEVERITY_COLORS = {
+  'Negligible':    '#6b7280',
+  'Minor':         '#22c55e',
+  'Moderate':      '#eab308',
+  'Major':         '#f97316',
+  'Catastrophic':  '#dc2626'
+};
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let state = JSON.parse(document.getElementById('bowtie-state').textContent);
+
+function normaliseState(s) {
+  if (s.threats && s.threats.length && typeof s.threats[0] === 'string')
+    s.threats = s.threats.map(t => ({ label: t, controls: [] }));
+  if (s.outcomes && s.outcomes.length && typeof s.outcomes[0] === 'string')
+    s.outcomes = s.outcomes.map(o => ({ label: o, controls: [] }));
+  if (!s.threats)  s.threats  = [];
+  if (!s.outcomes) s.outcomes = [];
+  if (!s.topEventLikelihood) s.topEventLikelihood = '';
+  if (!s.topEventNotes)      s.topEventNotes      = '';
+  s.threats.forEach(t => {
+    if (!t.controls)   t.controls   = [];
+    if (t.likelihood === undefined) t.likelihood = '';
+    if (!t.notes)      t.notes      = '';
+  });
+  s.outcomes.forEach(o => {
+    if (!o.controls)   o.controls   = [];
+    if (o.likelihood === undefined) o.likelihood = '';
+    if (o.severity   === undefined) o.severity   = '';
+    if (!o.notes)      o.notes      = '';
+  });
+}
+normaliseState(state);
+
+// ═══════════════════════════════════════════════════════
+// LAYOUT CONSTANTS
+// ═══════════════════════════════════════════════════════
+const CX = 1200, CY = 820;
+const TE_R = 108;
+const BOX_W = 186, BOX_H = 90;   // taller to accommodate meta strip
+const CTRL_W = 104, CTRL_H = 38;
+const BOX_GAP = 42;               // slightly wider gap for readability
+const END_BUFFER = 24;
+const CTRL_GAP = 14;
+const HAZ_W = 220, HAZ_H = 62;
+const HAZ_X = CX - HAZ_W / 2, HAZ_Y_BASE = 220;
+
+// Box layout zones (relative to box.y)
+const LABEL_CY_OFFSET  = 27;   // label text centre when meta present
+const DIVIDER_Y_OFFSET = 50;   // horizontal divider between label and meta
+const CHIP_Y_OFFSET    = 63;   // chip(s) centre
+const NOTES_Y_OFFSET   = 78;   // notes text centre
+
+const COLORS = {
+  threat:  { fill:'#dbeafe', stroke:'#93c5fd', text:'#1e3a8a', line:'#60a5fa' },
+  outcome: { fill:'#fee2e2', stroke:'#fca5a5', text:'#7f1d1d', line:'#f87171' },
+  hazard:  { fill:'#fef9c3', stroke:'#fde047', text:'#78350f', line:'#a78bfa' },
+  te:      { fill:'#ede9fe', stroke:'#c4b5fd', text:'#3b0764' },
+  control: { fill:'#ffffff', stroke:'#6b7494', text:'#1f2937' }
+};
+
+// ═══════════════════════════════════════════════════════
+// VIEWPORT ENGINE
+// ═══════════════════════════════════════════════════════
+const ws   = document.getElementById('workspace');
+const wld  = document.getElementById('world');
+const zpct = document.getElementById('zoom-pct');
+
+let vp = { s: 0.40, tx: 0, ty: 0 };
+let panning = false, panStart = null, spaceDown = false;
+
+function applyVP() {
+  wld.setAttribute('transform', `matrix(${vp.s},0,0,${vp.s},${vp.tx},${vp.ty})`);
+  zpct.textContent = Math.round(vp.s * 100) + '%';
+}
+
+function zoomAt(cx, cy, factor) {
+  const wx = (cx - vp.tx) / vp.s;
+  const wy = (cy - vp.ty) / vp.s;
+  vp.s = Math.min(Math.max(vp.s * factor, 0.04), 8);
+  vp.tx = cx - wx * vp.s;
+  vp.ty = cy - wy * vp.s;
+  applyVP();
+}
+
+function fitView() {
+  const tBoxes = boxPositions(state.threats, true);
+  const oBoxes = boxPositions(state.outcomes, false);
+  const n = Math.max(state.threats.length, state.outcomes.length, 1);
+  const totalH = n * BOX_H + (n - 1) * BOX_GAP;
+  const pad = 100;
+
+  let minX = CX - 600, maxX = CX + 600;
+  if (tBoxes.length > 0) minX = Math.min(...tBoxes.map(b => b.x)) - pad;
+  if (oBoxes.length > 0) maxX = Math.max(...oBoxes.map(b => b.x + BOX_W)) + pad;
+
+  let minYt = CY - totalH/2, minYo = CY - totalH/2;
+  if (tBoxes.length > 0) minYt = Math.min(...tBoxes.map(b => b.y));
+  if (oBoxes.length > 0) minYo = Math.min(...oBoxes.map(b => b.y));
+  const HAZ_Y = Math.min(minYt, minYo) - 100;
+
+  const minY = Math.min(HAZ_Y, CY - totalH/2) - pad;
+  const maxY = Math.max(CY + totalH/2, CY + TE_R) + pad;
+  const cw = ws.clientWidth || 900, ch = ws.clientHeight || 600;
+  vp.s = Math.min(cw / (maxX - minX), ch / (maxY - minY)) * 0.9;
+  vp.tx = (cw - (maxX - minX) * vp.s) / 2 - minX * vp.s;
+  vp.ty = (ch - (maxY - minY) * vp.s) / 2 - minY * vp.s;
+  applyVP();
+}
+
+ws.addEventListener('wheel', e => {
+  e.preventDefault();
+  const r = ws.getBoundingClientRect();
+  zoomAt(e.clientX - r.left, e.clientY - r.top, e.deltaY < 0 ? 1.1 : 1/1.1);
+}, { passive: false });
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space' && !e.target.matches('input,textarea,select')) {
+    spaceDown = true; ws.classList.add('pan-ready'); e.preventDefault();
+  }
+});
+document.addEventListener('keyup', e => {
+  if (e.code === 'Space') {
+    spaceDown = false;
+    if (!panning) ws.classList.remove('pan-ready');
+  }
+});
+
+ws.addEventListener('mousedown', e => {
+  if (e.button === 1 || (e.button === 0 && spaceDown)) {
+    e.preventDefault();
+    panning = true;
+    panStart = { x: e.clientX, y: e.clientY, tx: vp.tx, ty: vp.ty };
+    ws.classList.add('panning'); ws.classList.remove('pan-ready');
+  }
+});
+window.addEventListener('mousemove', e => {
+  if (panning) { vp.tx = panStart.tx + (e.clientX - panStart.x); vp.ty = panStart.ty + (e.clientY - panStart.y); applyVP(); }
+});
+window.addEventListener('mouseup', () => {
+  if (panning) { panning = false; ws.classList.remove('panning'); if (spaceDown) ws.classList.add('pan-ready'); }
+});
+ws.addEventListener('contextmenu', e => { if (e.button === 1) e.preventDefault(); });
+
+document.getElementById('btn-zi').onclick = () => { const c = ws.clientWidth/2; zoomAt(c, ws.clientHeight/2, 1.2); };
+document.getElementById('btn-zo').onclick = () => { const c = ws.clientWidth/2; zoomAt(c, ws.clientHeight/2, 1/1.2); };
+document.getElementById('btn-zr').onclick = fitView;
+document.getElementById('btn-fit').onclick = fitView;
+
+// ═══════════════════════════════════════════════════════
+// SVG HELPERS
+// ═══════════════════════════════════════════════════════
+const SVG_NS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(SVG_NS, tag);
+  if (attrs) for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function circleEdge(fromX, fromY, r) {
+  const dx = CX - fromX, dy = CY - fromY;
+  const d = Math.hypot(dx, dy) || 1;
+  return { x: CX - r * dx/d, y: CY - r * dy/d };
+}
+
+function addText(parent, cx, cy, label, size, fill, maxW) {
+  const charW = size * 0.54;
+  const maxCh = Math.max(6, Math.floor((maxW - 10) / charW));
+  let lines;
+  if (label.length <= maxCh) {
+    lines = [label];
+  } else {
+    const words = label.split(' ');
+    let best = 1, bestDiff = Infinity;
+    for (let i = 1; i < words.length; i++) {
+      const diff = Math.abs(words.slice(0,i).join(' ').length - words.slice(i).join(' ').length);
+      if (diff < bestDiff) { bestDiff = diff; best = i; }
+    }
+    lines = [words.slice(0, best).join(' '), words.slice(best).join(' ')].filter(Boolean);
+  }
+  const lh = size * 1.25;
+  const offsetY = -(lines.length - 1) * lh / 2;
+  lines.forEach((ln, i) => {
+    parent.appendChild(el('text', {
+      x: cx, y: cy + offsetY + i * lh,
+      'text-anchor': 'middle', 'dominant-baseline': 'central',
+      'font-size': size, 'font-family': "system-ui,-apple-system,sans-serif",
+      'font-weight': '600', fill
+    })).textContent = ln;
+  });
+}
+
+function makeMarker(defs, id, stroke) {
+  const m = el('marker', {
+    id, viewBox:'0 0 10 10', refX:'8', refY:'5',
+    markerWidth:'6', markerHeight:'6', orient:'auto-start-reverse'
+  });
+  m.appendChild(el('path', {
+    d:'M2 1L8 5L2 9', fill:'none', stroke,
+    'stroke-width':'1.6', 'stroke-linecap':'round', 'stroke-linejoin':'round'
+  }));
+  defs.appendChild(m);
+}
+
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1,3), 16);
+  const g = parseInt(hex.slice(3,5), 16);
+  const b = parseInt(hex.slice(5,7), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+// Render a small coloured badge onto an SVG group
+function renderMetaBadge(parent, cx, cy, text, color) {
+  const chipW = 82, chipH = 14;
+  const g = el('g');
+  g.appendChild(el('rect', {
+    x: cx - chipW/2, y: cy - chipH/2, width: chipW, height: chipH, rx: 3.5,
+    fill: hexToRgba(color, 0.15), stroke: color, 'stroke-width': '0.9'
+  }));
+  const t = el('text', {
+    x: cx, y: cy, 'text-anchor': 'middle', 'dominant-baseline': 'central',
+    'font-size': '8', 'font-family': "system-ui,-apple-system,sans-serif",
+    'font-weight': '700', fill: color
+  });
+  t.textContent = text;
+  g.appendChild(t);
+  parent.appendChild(g);
+}
+
+// Render small italic notes text
+function renderNotesText(parent, cx, cy, text) {
+  const truncated = text.length > 36 ? text.slice(0, 36) + '…' : text;
+  const t = el('text', {
+    x: cx, y: cy, 'text-anchor': 'middle', 'dominant-baseline': 'central',
+    'font-size': '7.5', 'font-family': "system-ui,-apple-system,sans-serif",
+    'font-weight': '400', fill: 'rgba(0,0,0,0.36)', 'font-style': 'italic'
+  });
+  t.textContent = truncated;
+  parent.appendChild(t);
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER ENGINE
+// ═══════════════════════════════════════════════════════
+function boxPositions(items, isLeft) {
+  const n = items.length;
+  const totalH = n * BOX_H + Math.max(0, n - 1) * BOX_GAP;
+  const startY = CY - totalH / 2;
+
+  let maxCtrl = 0;
+  items.forEach(item => { if (item.controls && item.controls.length > maxCtrl) maxCtrl = item.controls.length; });
+
+  const lengthOfHorzLine = (END_BUFFER * 2) + ((CTRL_W + CTRL_GAP) * maxCtrl);
+  const innerAnchorDistance = TE_R + 40;
+  const apexX = isLeft ? CX - innerAnchorDistance : CX + innerAnchorDistance;
+  const x = isLeft ? apexX - lengthOfHorzLine - BOX_W : apexX + lengthOfHorzLine;
+
+  return items.map((item, i) => {
+    const y = startY + i * (BOX_H + BOX_GAP);
+    return {
+      label:      item.label,
+      controls:   item.controls || [],
+      likelihood: item.likelihood || '',
+      severity:   item.severity  || '',
+      notes:      item.notes     || '',
+      x, y,
+      cx: x + BOX_W / 2,
+      cy: y + BOX_H / 2,
+      lengthOfHorzLine, apexX
+    };
+  });
+}
+
+function computeHAZ_Y(tBoxes, oBoxes) {
+  let minYt = CY - 200, minYo = CY - 200;
+  if (tBoxes.length > 0) minYt = Math.min(...tBoxes.map(b => b.y));
+  if (oBoxes.length > 0) minYo = Math.min(...oBoxes.map(b => b.y));
+  return Math.min(minYt, minYo) - 100;
+}
+
+function render() {
+  while (wld.firstChild) wld.removeChild(wld.firstChild);
+
+  const defs = el('defs');
+  makeMarker(defs, 'arr-t', COLORS.threat.line);
+  makeMarker(defs, 'arr-o', COLORS.outcome.line);
+  makeMarker(defs, 'arr-h', '#a78bfa');
+  wld.appendChild(defs);
+
+  const tBoxes = boxPositions(state.threats, true);
+  const oBoxes = boxPositions(state.outcomes, false);
+  const HAZ_Y  = computeHAZ_Y(tBoxes, oBoxes);
+  const HAZ_X  = CX - HAZ_W / 2;
+
+  // ── Wing fills ──────────────────────────────────────
+  if (tBoxes.length > 0) {
+    const top = tBoxes[0], bot = tBoxes[tBoxes.length - 1];
+    const ec1 = circleEdge(top.apexX, top.cy, TE_R), ec2 = circleEdge(bot.apexX, bot.cy, TE_R);
+    const midCE = circleEdge(top.apexX, CY, TE_R);
+    wld.appendChild(el('polygon', {
+      points:`${top.apexX},${top.cy} ${bot.apexX},${bot.cy} ${ec2.x},${ec2.y} ${midCE.x},${midCE.y} ${ec1.x},${ec1.y}`,
+      fill:'rgba(147,197,253,0.06)', stroke:'none'
+    }));
+  }
+  if (oBoxes.length > 0) {
+    const top = oBoxes[0], bot = oBoxes[oBoxes.length - 1];
+    const ec1 = circleEdge(top.apexX, top.cy, TE_R), ec2 = circleEdge(bot.apexX, bot.cy, TE_R);
+    const midCE = circleEdge(top.apexX, CY, TE_R);
+    wld.appendChild(el('polygon', {
+      points:`${top.apexX},${top.cy} ${bot.apexX},${bot.cy} ${ec2.x},${ec2.y} ${midCE.x},${midCE.y} ${ec1.x},${ec1.y}`,
+      fill:'rgba(252,165,165,0.06)', stroke:'none'
+    }));
+  }
+
+  // ── Threat lines & controls ─────────────────────────
+  tBoxes.forEach(box => {
+    const edge = circleEdge(box.apexX, box.cy, TE_R);
+    wld.appendChild(el('path', {
+      d:`M${box.x + BOX_W} ${box.cy} H${box.apexX} L${edge.x} ${edge.y}`,
+      fill:'none', stroke:COLORS.threat.line, 'stroke-width':'2', 'stroke-linecap':'round', 'stroke-linejoin':'round',
+      'marker-end':'url(#arr-t)'
+    }));
+    wld.appendChild(el('circle', { cx:box.apexX, cy:box.cy, r:'3.5', fill:COLORS.threat.line, opacity:'0.5' }));
+    if (box.controls.length > 0) {
+      const startX = box.x + BOX_W + END_BUFFER + (CTRL_W / 2);
+      box.controls.forEach((ctrl, cIdx) => {
+        renderControlBlock(startX + cIdx * (CTRL_W + CTRL_GAP), box.cy, ctrl, COLORS.threat.stroke);
+      });
+    }
+  });
+
+  // ── Outcome lines & controls ────────────────────────
+  oBoxes.forEach(box => {
+    const edge = circleEdge(box.apexX, box.cy, TE_R);
+    wld.appendChild(el('path', {
+      d:`M${edge.x} ${edge.y} L${box.apexX} ${box.cy} H${box.x}`,
+      fill:'none', stroke:COLORS.outcome.line, 'stroke-width':'2', 'stroke-linecap':'round', 'stroke-linejoin':'round',
+      'marker-end':'url(#arr-o)'
+    }));
+    wld.appendChild(el('circle', { cx:box.apexX, cy:box.cy, r:'3.5', fill:COLORS.outcome.line, opacity:'0.5' }));
+    if (box.controls.length > 0) {
+      const startX = box.apexX + END_BUFFER + (CTRL_W / 2);
+      box.controls.forEach((ctrl, cIdx) => {
+        renderControlBlock(startX + cIdx * (CTRL_W + CTRL_GAP), box.cy, ctrl, COLORS.outcome.stroke);
+      });
+    }
+  });
+
+  // ── Hazard connector ────────────────────────────────
+  {
+    const edge = circleEdge(CX, HAZ_Y + HAZ_H, TE_R);
+    wld.appendChild(el('path', {
+      d:`M${CX} ${HAZ_Y + HAZ_H} L${edge.x} ${edge.y}`,
+      fill:'none', stroke:'#a78bfa', 'stroke-width':'2', 'stroke-dasharray':'7 5', 'marker-end':'url(#arr-h)'
+    }));
+  }
+
+  // ── Axis / track labels ─────────────────────────────
+  let minLeftX = CX - 500, maxRightX = CX + 500;
+  if (tBoxes.length > 0) minLeftX = Math.min(...tBoxes.map(b => b.x));
+  if (oBoxes.length > 0) maxRightX = Math.max(...oBoxes.map(b => b.x + BOX_W));
+
+  const lx = minLeftX - 38, rx = maxRightX + 38;
+  [{x:lx,label:'CAUSES',fill:'rgba(96,165,250,0.4)'},{x:rx,label:'CONSEQUENCES',fill:'rgba(248,113,113,0.4)'}].forEach(({x,label,fill}) => {
+    const t = el('text', { x, y:CY, 'text-anchor':'middle', 'dominant-baseline':'central', 'font-size':'10', 'font-family':"system-ui,sans-serif", 'font-weight':'700', 'letter-spacing':'3', fill, transform:`rotate(-90, ${x}, ${CY})` });
+    t.textContent = label;
+    wld.appendChild(t);
+  });
+
+  if (tBoxes.length > 0) {
+    const trackX = tBoxes[0].x + BOX_W + (tBoxes[0].apexX - tBoxes[0].x - BOX_W) / 2;
+    const labelY  = CY + (Math.max(state.threats.length, state.outcomes.length, 1) * (BOX_H + BOX_GAP)) / 2 - BOX_GAP / 2;
+    const t = el('text', { x:trackX, y:labelY + 24, 'text-anchor':'middle', 'dominant-baseline':'central', 'font-size':'9', 'font-family':"system-ui,sans-serif", 'font-weight':'700', 'letter-spacing':'3', fill:'rgba(96,165,250,0.55)' });
+    t.textContent = 'PREVENTATIVE BARRIERS';
+    wld.appendChild(t);
+  }
+  if (oBoxes.length > 0) {
+    const trackX = oBoxes[0].apexX + (oBoxes[0].x - oBoxes[0].apexX) / 2;
+    const labelY  = CY + (Math.max(state.threats.length, state.outcomes.length, 1) * (BOX_H + BOX_GAP)) / 2 - BOX_GAP / 2;
+    const t = el('text', { x:trackX, y:labelY + 24, 'text-anchor':'middle', 'dominant-baseline':'central', 'font-size':'9', 'font-family':"system-ui,sans-serif", 'font-weight':'700', 'letter-spacing':'3', fill:'rgba(248,113,113,0.55)' });
+    t.textContent = 'RECOVERY BARRIERS';
+    wld.appendChild(t);
+  }
+
+  // ── Threat boxes ────────────────────────────────────
+  tBoxes.forEach(box => {
+    const g = el('g');
+    const hasMeta = box.likelihood || box.notes;
+    g.appendChild(el('rect', { x:box.x, y:box.y, width:BOX_W, height:BOX_H, rx:'9', fill:COLORS.threat.fill, stroke:COLORS.threat.stroke, 'stroke-width':'1.5' }));
+    g.appendChild(el('rect', { x:box.x, y:box.y + 8, width:'4', height:BOX_H - 16, rx:'2', fill:COLORS.threat.line, opacity:'0.7' }));
+    if (hasMeta) {
+      g.appendChild(el('line', { x1:box.x+6, y1:box.y+DIVIDER_Y_OFFSET, x2:box.x+BOX_W-6, y2:box.y+DIVIDER_Y_OFFSET, stroke:'rgba(0,0,0,0.08)', 'stroke-width':'0.8' }));
+      addText(g, box.cx + 2, box.y + LABEL_CY_OFFSET, box.label, 11.5, COLORS.threat.text, BOX_W - 10);
+      if (box.likelihood) {
+        const lc = LIKELIHOOD_COLORS[box.likelihood] || '#888';
+        renderMetaBadge(g, box.cx, box.y + CHIP_Y_OFFSET, box.likelihood, lc);
+      }
+      if (box.notes) renderNotesText(g, box.cx + 2, box.y + NOTES_Y_OFFSET, box.notes);
+    } else {
+      addText(g, box.cx + 2, box.cy, box.label, 12.5, COLORS.threat.text, BOX_W - 10);
+    }
+    wld.appendChild(g);
+  });
+
+  // ── Outcome boxes ───────────────────────────────────
+  oBoxes.forEach(box => {
+    const g = el('g');
+    const hasMeta = box.likelihood || box.severity || box.notes;
+    g.appendChild(el('rect', { x:box.x, y:box.y, width:BOX_W, height:BOX_H, rx:'9', fill:COLORS.outcome.fill, stroke:COLORS.outcome.stroke, 'stroke-width':'1.5' }));
+    g.appendChild(el('rect', { x:box.x + BOX_W - 4, y:box.y + 8, width:'4', height:BOX_H - 16, rx:'2', fill:COLORS.outcome.line, opacity:'0.7' }));
+    if (hasMeta) {
+      g.appendChild(el('line', { x1:box.x+6, y1:box.y+DIVIDER_Y_OFFSET, x2:box.x+BOX_W-6, y2:box.y+DIVIDER_Y_OFFSET, stroke:'rgba(0,0,0,0.08)', 'stroke-width':'0.8' }));
+      addText(g, box.cx - 2, box.y + LABEL_CY_OFFSET, box.label, 11.5, COLORS.outcome.text, BOX_W - 10);
+      const hasBoth = box.likelihood && box.severity;
+      if (hasBoth) {
+        renderMetaBadge(g, box.cx - 43, box.y + CHIP_Y_OFFSET, box.likelihood, LIKELIHOOD_COLORS[box.likelihood] || '#888');
+        renderMetaBadge(g, box.cx + 43, box.y + CHIP_Y_OFFSET, box.severity,   SEVERITY_COLORS[box.severity]     || '#888');
+      } else {
+        if (box.likelihood) renderMetaBadge(g, box.cx, box.y + CHIP_Y_OFFSET, box.likelihood, LIKELIHOOD_COLORS[box.likelihood] || '#888');
+        if (box.severity)   renderMetaBadge(g, box.cx, box.y + CHIP_Y_OFFSET, box.severity,   SEVERITY_COLORS[box.severity]     || '#888');
+      }
+      if (box.notes) renderNotesText(g, box.cx - 2, box.y + NOTES_Y_OFFSET, box.notes);
+    } else {
+      addText(g, box.cx - 2, box.cy, box.label, 12.5, COLORS.outcome.text, BOX_W - 10);
+    }
+    wld.appendChild(g);
+  });
+
+  // ── Hazard box ──────────────────────────────────────
+  {
+    const g = el('g');
+    g.appendChild(el('rect', { x:HAZ_X - 4, y:HAZ_Y - 4, width:HAZ_W + 8, height:HAZ_H + 8, rx:'14', fill:'rgba(253,224,71,0.15)' }));
+    g.appendChild(el('rect', { x:HAZ_X, y:HAZ_Y, width:HAZ_W, height:HAZ_H, rx:'10', fill:COLORS.hazard.fill, stroke:COLORS.hazard.stroke, 'stroke-width':'2' }));
+    const lbl = el('text', { x:CX, y:HAZ_Y - 12, 'text-anchor':'middle', 'dominant-baseline':'central', 'font-size':'9', 'font-family':"system-ui,sans-serif", 'font-weight':'700', 'letter-spacing':'3', fill:'rgba(161,97,0,0.6)' });
+    lbl.textContent = 'HAZARD';
+    wld.appendChild(lbl);
+    addText(g, CX, HAZ_Y + HAZ_H/2, state.hazard, 13, COLORS.hazard.text, HAZ_W);
+    wld.appendChild(g);
+  }
+
+  // ── Top Event circle ────────────────────────────────
+  {
+    const g = el('g');
+    g.appendChild(el('circle', { cx:CX, cy:CY, r:TE_R + 8, fill:'rgba(167,139,250,0.09)' }));
+    g.appendChild(el('circle', { cx:CX, cy:CY, r:TE_R, fill:COLORS.te.fill, stroke:COLORS.te.stroke, 'stroke-width':'2' }));
+    const lbl = el('text', { x:CX, y:CY - TE_R - 13, 'text-anchor':'middle', 'dominant-baseline':'central', 'font-size':'9', 'font-family':"system-ui,sans-serif", 'font-weight':'700', 'letter-spacing':'3', fill:'rgba(124,58,237,0.55)' });
+    lbl.textContent = 'TOP EVENT';
+    g.appendChild(lbl);
+
+    const hasTEmeta = state.topEventLikelihood || state.topEventNotes;
+    const teLabelY  = hasTEmeta ? CY - 22 : CY;
+    addText(g, CX, teLabelY, state.topEvent, 13.5, COLORS.te.text, TE_R * 1.72);
+    if (state.topEventLikelihood) {
+      const lc = LIKELIHOOD_COLORS[state.topEventLikelihood] || '#888';
+      renderMetaBadge(g, CX, CY + 12, state.topEventLikelihood, lc);
+    }
+    if (state.topEventNotes) renderNotesText(g, CX, CY + 32, state.topEventNotes);
+    wld.appendChild(g);
+  }
+
+  updateStatus();
+}
+
+function renderControlBlock(cx, cy, label, accentColor) {
+  const x = cx - CTRL_W / 2, y = cy - CTRL_H / 2;
+  const g = el('g');
+  g.appendChild(el('rect', { x, y, width:CTRL_W, height:CTRL_H, rx:5, fill:COLORS.control.fill, stroke:COLORS.control.stroke, 'stroke-width':'1.2' }));
+  g.appendChild(el('rect', { x, y, width:'3.5', height:CTRL_H, rx:'1.5', fill:accentColor }));
+  addText(g, cx + 2, cy, label, 10.5, COLORS.control.text, CTRL_W - 6);
+  wld.appendChild(g);
+}
+
+function updateStatus() {
+  const s = document.getElementById('status');
+  let tc = 0, oc = 0;
+  state.threats.forEach(t => tc += (t.controls || []).length);
+  state.outcomes.forEach(o => oc += (o.controls || []).length);
+  if (s) s.textContent = `${state.threats.length} threats (${tc} controls) · ${state.outcomes.length} outcomes (${oc} controls)`;
+}
+
+// ═══════════════════════════════════════════════════════
+// SIDEBAR CONTROL IMPLEMENTATION
+// ═══════════════════════════════════════════════════════
+function makeSelectEl(options, currentValue, onChange) {
+  const sel = document.createElement('select');
+  sel.className = 'meta-select';
+  const blank = document.createElement('option');
+  blank.value = ''; blank.textContent = '— select —';
+  sel.appendChild(blank);
+  options.forEach(opt => {
+    const o = document.createElement('option');
+    o.value = opt; o.textContent = opt;
+    if (opt === currentValue) o.selected = true;
+    sel.appendChild(o);
+  });
+  sel.addEventListener('change', () => onChange(sel.value));
+  return sel;
+}
+
+function buildList(containerId, items, key) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  items.forEach((item, i) => {
+    const parentRow = document.createElement('div');
+    parentRow.style.marginBottom = '10px';
+
+    // ── Main label row ──
+    const row = document.createElement('div');
+    row.className = 'item-row';
+
+    const num = document.createElement('div');
+    num.className = 'item-num';
+    num.textContent = i + 1;
+
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.value = item.label;
+    inp.placeholder = key === 'threats' ? 'Threat / cause…' : 'Outcome / consequence…';
+    inp.addEventListener('input', () => { state[key][i].label = inp.value; render(); });
+
+    const del = document.createElement('button');
+    del.className = 'btn-del';
+    del.title = 'Remove';
+    del.innerHTML = '×';
+    del.addEventListener('click', () => { state[key].splice(i, 1); buildList(containerId, state[key], key); render(); });
+
+    row.appendChild(num); row.appendChild(inp); row.appendChild(del);
+    parentRow.appendChild(row);
+
+    // ── Likelihood ──
+    const likRow = document.createElement('div');
+    likRow.className = 'meta-row';
+    const likLbl = document.createElement('span');
+    likLbl.className = 'meta-label';
+    likLbl.textContent = 'Likelihood';
+    const likSel = makeSelectEl(LIKELIHOOD_OPTIONS, item.likelihood || '', val => { state[key][i].likelihood = val; render(); });
+    likRow.appendChild(likLbl); likRow.appendChild(likSel);
+    parentRow.appendChild(likRow);
+
+    // ── Severity (outcomes only) ──
+    if (key === 'outcomes') {
+      const sevRow = document.createElement('div');
+      sevRow.className = 'meta-row';
+      const sevLbl = document.createElement('span');
+      sevLbl.className = 'meta-label';
+      sevLbl.textContent = 'Severity';
+      const sevSel = makeSelectEl(SEVERITY_OPTIONS, item.severity || '', val => { state[key][i].severity = val; render(); });
+      sevRow.appendChild(sevLbl); sevRow.appendChild(sevSel);
+      parentRow.appendChild(sevRow);
+    }
+
+    // ── Notes ──
+    const notesRow = document.createElement('div');
+    notesRow.className = 'meta-row';
+    const notesLbl = document.createElement('span');
+    notesLbl.className = 'meta-label';
+    notesLbl.textContent = 'Notes';
+    const notesInp = document.createElement('input');
+    notesInp.type = 'text';
+    notesInp.className = 'meta-notes';
+    notesInp.value = item.notes || '';
+    notesInp.placeholder = 'Justification…';
+    notesInp.addEventListener('input', () => { state[key][i].notes = notesInp.value; render(); });
+    notesRow.appendChild(notesLbl); notesRow.appendChild(notesInp);
+    parentRow.appendChild(notesRow);
+
+    // ── Controls ──
+    const ctrlContainer = document.createElement('div');
+    ctrlContainer.className = 'controls-container';
+    if (!item.controls) item.controls = [];
+    item.controls.forEach((ctrl, cIdx) => {
+      const cRow = document.createElement('div');
+      cRow.className = 'control-row';
+      const cInp = document.createElement('input');
+      cInp.type = 'text'; cInp.value = ctrl; cInp.placeholder = 'Barrier control element…';
+      cInp.addEventListener('input', () => { state[key][i].controls[cIdx] = cInp.value; render(); });
+      const cDel = document.createElement('button');
+      cDel.className = 'btn-del';
+      cDel.style.width = '20px'; cDel.style.height = '20px'; cDel.style.fontSize = '11px';
+      cDel.innerHTML = '×';
+      cDel.addEventListener('click', () => { state[key][i].controls.splice(cIdx, 1); buildList(containerId, state[key], key); render(); });
+      cRow.appendChild(cInp); cRow.appendChild(cDel);
+      ctrlContainer.appendChild(cRow);
+    });
+
+    const btnAddCtrl = document.createElement('button');
+    btnAddCtrl.className = 'btn-add-ctrl';
+    btnAddCtrl.innerHTML = `<span>+</span> Add ${key === 'threats' ? 'Preventative' : 'Recovery'} Control`;
+    btnAddCtrl.addEventListener('click', () => { state[key][i].controls.push('New Control'); buildList(containerId, state[key], key); render(); });
+
+    parentRow.appendChild(ctrlContainer);
+    parentRow.appendChild(btnAddCtrl);
+    container.appendChild(parentRow);
+  });
+}
+
+function initSelects() {
+  const sel = document.getElementById('sel-te-likelihood');
+  while (sel.firstChild) sel.removeChild(sel.firstChild);
+  const blank = document.createElement('option'); blank.value = ''; blank.textContent = '— select —'; sel.appendChild(blank);
+  LIKELIHOOD_OPTIONS.forEach(opt => {
+    const o = document.createElement('option'); o.value = opt; o.textContent = opt; sel.appendChild(o);
+  });
+}
+
+function refreshSidebar() {
+  document.getElementById('inp-hazard').value    = state.hazard;
+  document.getElementById('inp-top-event').value = state.topEvent;
+  document.getElementById('sel-te-likelihood').value = state.topEventLikelihood || '';
+  document.getElementById('inp-te-notes').value       = state.topEventNotes      || '';
+  buildList('threats-list',  state.threats,  'threats');
+  buildList('outcomes-list', state.outcomes, 'outcomes');
+}
+
+document.getElementById('inp-hazard').addEventListener('input', e => { state.hazard = e.target.value; render(); });
+document.getElementById('inp-top-event').addEventListener('input', e => { state.topEvent = e.target.value; render(); });
+document.getElementById('sel-te-likelihood').addEventListener('change', e => { state.topEventLikelihood = e.target.value; render(); });
+document.getElementById('inp-te-notes').addEventListener('input', e => { state.topEventNotes = e.target.value; render(); });
+
+document.getElementById('btn-add-threat').addEventListener('click', () => {
+  state.threats.push({ label: 'New Threat', controls: [], likelihood: '', notes: '' });
+  buildList('threats-list', state.threats, 'threats');
+  render();
+  const inputs = document.querySelectorAll('#threats-list .item-row input');
+  if (inputs.length) { inputs[inputs.length-1].focus(); inputs[inputs.length-1].select(); }
+});
+
+document.getElementById('btn-add-outcome').addEventListener('click', () => {
+  state.outcomes.push({ label: 'New Outcome', controls: [], likelihood: '', severity: '', notes: '' });
+  buildList('outcomes-list', state.outcomes, 'outcomes');
+  render();
+  const inputs = document.querySelectorAll('#outcomes-list .item-row input');
+  if (inputs.length) { inputs[inputs.length-1].focus(); inputs[inputs.length-1].select(); }
+});
+
+// ═══════════════════════════════════════════════════════
+// EXPORT CANVASSING ENGINE — PNG
+// ═══════════════════════════════════════════════════════
+document.getElementById('btn-png').addEventListener('click', () => {
+  const PAD = 90, SCALE = 2.5;
+  const tBoxes = boxPositions(state.threats, true);
+  const oBoxes = boxPositions(state.outcomes, false);
+  const HAZ_Y  = computeHAZ_Y(tBoxes, oBoxes);
+
+  const n = Math.max(state.threats.length, state.outcomes.length, 1);
+  const totalH = n * BOX_H + (n - 1) * BOX_GAP;
+
+  let minX = CX - 600, maxX = CX + 600;
+  if (tBoxes.length > 0) minX = Math.min(...tBoxes.map(b => b.x)) - PAD;
+  if (oBoxes.length > 0) maxX = Math.max(...oBoxes.map(b => b.x + BOX_W)) + PAD;
+
+  const minY = Math.min(HAZ_Y - 30, CY - totalH/2) - PAD;
+  const maxY = Math.max(CY + totalH/2, CY + TE_R) + PAD;
+  const W = maxX - minX, H = maxY - minY;
+
+  const svgStr = buildExportSVG(minX, minY, W, H, SCALE);
+  const blob = new Blob([svgStr], { type:'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+
+  const img = new Image();
+  img.onload = () => {
+    const cv = document.createElement('canvas');
+    cv.width = W * SCALE; cv.height = H * SCALE;
+    const ctx = cv.getContext('2d');
+    ctx.fillStyle = '#f2f0eb'; ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.fillStyle = 'rgba(200,196,188,0.55)';
+    const gs = 28 * SCALE;
+    for (let gx = 0; gx < cv.width; gx += gs)
+      for (let gy = 0; gy < cv.height; gy += gs)
+        { ctx.beginPath(); ctx.arc(gx + SCALE, gy + SCALE, 0.85*SCALE, 0, Math.PI*2); ctx.fill(); }
+    ctx.drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+    const a = document.createElement('a');
+    a.download = 'bowtie-risk-assessment.png'; a.href = cv.toDataURL('image/png'); a.click();
+  };
+  img.onerror = () => { alert('PNG export failed.'); URL.revokeObjectURL(url); };
+  img.src = url;
+});
+
+function buildExportSVG(ox, oy, W, H, sc) {
+  const tx = x => ((x - ox) * sc).toFixed(2);
+  const ty = y => ((y - oy) * sc).toFixed(2);
+  const sv = v => (v * sc).toFixed(2);
+
+  const tBoxes = boxPositions(state.threats, true);
+  const oBoxes = boxPositions(state.outcomes, false);
+  const HAZ_Y  = computeHAZ_Y(tBoxes, oBoxes);
+  const HAZ_X  = CX - HAZ_W / 2;
+
+  function expText(cx, cy, label, size, fill, maxW) {
+    const realSz = size * sc;
+    const charW = size * 0.54;
+    const maxCh = Math.max(6, Math.floor((maxW - 10) / charW));
+    let lines;
+    if (label.length <= maxCh) { lines = [label]; }
+    else {
+      const words = label.split(' ');
+      let best = 1, bestDiff = Infinity;
+      for (let i = 1; i < words.length; i++) {
+        const diff = Math.abs(words.slice(0,i).join(' ').length - words.slice(i).join(' ').length);
+        if (diff < bestDiff) { bestDiff = diff; best = i; }
+      }
+      lines = [words.slice(0, best).join(' '), words.slice(best).join(' ')].filter(Boolean);
+    }
+    const lh = realSz * 1.25;
+    const offsetY = -(lines.length-1)*lh/2;
+    return lines.map((ln, i) =>
+      `<text x="${tx(cx)}" y="${(parseFloat(ty(cy))+offsetY+i*lh).toFixed(2)}" text-anchor="middle" dominant-baseline="central" font-size="${realSz.toFixed(1)}" font-family="system-ui,sans-serif" font-weight="600" fill="${fill}">${escXML(ln)}</text>`
+    ).join('');
+  }
+
+  function expChip(cx, cy, text, color) {
+    const chipW = 82, chipH = 14;
+    const r = parseInt(color.slice(1,3),16), g = parseInt(color.slice(3,5),16), b = parseInt(color.slice(5,7),16);
+    const fill = `rgba(${r},${g},${b},0.15)`;
+    return `<rect x="${tx(cx-chipW/2)}" y="${ty(cy-chipH/2)}" width="${sv(chipW)}" height="${sv(chipH)}" rx="${sv(3.5)}" fill="${fill}" stroke="${color}" stroke-width="${sv(0.9)}"/>`
+         + `<text x="${tx(cx)}" y="${ty(cy)}" text-anchor="middle" dominant-baseline="central" font-size="${sv(8)}" font-family="system-ui,sans-serif" font-weight="700" fill="${color}">${escXML(text)}</text>`;
+  }
+
+  function expNotes(cx, cy, text) {
+    const truncated = text.length > 36 ? text.slice(0, 36) + '…' : text;
+    return `<text x="${tx(cx)}" y="${ty(cy)}" text-anchor="middle" dominant-baseline="central" font-size="${sv(7.5)}" font-family="system-ui,sans-serif" font-weight="400" fill="rgba(0,0,0,0.36)" font-style="italic">${escXML(truncated)}</text>`;
+  }
+
+  function arrowMarker(id, stroke) {
+    return `<marker id="${id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="${stroke}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>`;
+  }
+
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" width="${(W*sc).toFixed(0)}" height="${(H*sc).toFixed(0)}">`;
+  s += `<defs>${arrowMarker('aT',COLORS.threat.line)}${arrowMarker('aO',COLORS.outcome.line)}${arrowMarker('aH','#a78bfa')}</defs>`;
+
+  // Wing fills
+  if (tBoxes.length > 0) {
+    const top = tBoxes[0], bot = tBoxes[tBoxes.length - 1];
+    const ec1 = circleEdge(top.apexX, top.cy, TE_R), ec2 = circleEdge(bot.apexX, bot.cy, TE_R);
+    const midCE = circleEdge(top.apexX, CY, TE_R);
+    s += `<polygon points="${tx(top.apexX)},${ty(top.cy)} ${tx(bot.apexX)},${ty(bot.cy)} ${tx(ec2.x)},${ty(ec2.y)} ${tx(midCE.x)},${ty(midCE.y)} ${tx(ec1.x)},${ty(ec1.y)}" fill="rgba(147,197,253,0.06)" stroke="none"/>`;
+  }
+  if (oBoxes.length > 0) {
+    const top = oBoxes[0], bot = oBoxes[oBoxes.length - 1];
+    const ec1 = circleEdge(top.apexX, top.cy, TE_R), ec2 = circleEdge(bot.apexX, bot.cy, TE_R);
+    const midCE = circleEdge(top.apexX, CY, TE_R);
+    s += `<polygon points="${tx(top.apexX)},${ty(top.cy)} ${tx(bot.apexX)},${ty(bot.cy)} ${tx(ec2.x)},${ty(ec2.y)} ${tx(midCE.x)},${ty(midCE.y)} ${tx(ec1.x)},${ty(ec1.y)}" fill="rgba(252,165,165,0.06)" stroke="none"/>`;
+  }
+
+  // Threat lines & controls
+  tBoxes.forEach(b => {
+    const e = circleEdge(b.apexX, b.cy, TE_R);
+    s += `<path d="M${tx(b.x + BOX_W)} ${ty(b.cy)} H${tx(b.apexX)} L${tx(e.x)} ${ty(e.y)}" fill="none" stroke="${COLORS.threat.line}" stroke-width="${sv(2)}" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#aT)"/>`;
+    s += `<circle cx="${tx(b.apexX)}" cy="${ty(b.cy)}" r="${sv(3.5)}" fill="${COLORS.threat.line}" opacity="0.5"/>`;
+    if (b.controls.length > 0) {
+      const startX = b.x + BOX_W + END_BUFFER + CTRL_W / 2;
+      b.controls.forEach((ctrl, cIdx) => {
+        const cx = startX + cIdx * (CTRL_W + CTRL_GAP);
+        s += `<rect x="${tx(cx - CTRL_W/2)}" y="${ty(b.cy - CTRL_H/2)}" width="${sv(CTRL_W)}" height="${sv(CTRL_H)}" rx="${sv(5)}" fill="${COLORS.control.fill}" stroke="${COLORS.control.stroke}" stroke-width="${sv(1.2)}"/>`;
+        s += `<rect x="${tx(cx - CTRL_W/2)}" y="${ty(b.cy - CTRL_H/2)}" width="${sv(3.5)}" height="${sv(CTRL_H)}" rx="${sv(1.5)}" fill="${COLORS.threat.stroke}"/>`;
+        s += expText(cx, b.cy, ctrl, 10.5, COLORS.control.text, CTRL_W - 6);
+      });
+    }
+  });
+
+  // Outcome lines & controls
+  oBoxes.forEach(b => {
+    const e = circleEdge(b.apexX, b.cy, TE_R);
+    s += `<path d="M${tx(e.x)} ${ty(e.y)} L${tx(b.apexX)} ${ty(b.cy)} H${tx(b.x)}" fill="none" stroke="${COLORS.outcome.line}" stroke-width="${sv(2)}" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#aO)"/>`;
+    s += `<circle cx="${tx(b.apexX)}" cy="${ty(b.cy)}" r="${sv(3.5)}" fill="${COLORS.outcome.line}" opacity="0.5"/>`;
+    if (b.controls.length > 0) {
+      const startX = b.apexX + END_BUFFER + CTRL_W / 2;
+      b.controls.forEach((ctrl, cIdx) => {
+        const cx = startX + cIdx * (CTRL_W + CTRL_GAP);
+        s += `<rect x="${tx(cx - CTRL_W/2)}" y="${ty(b.cy - CTRL_H/2)}" width="${sv(CTRL_W)}" height="${sv(CTRL_H)}" rx="${sv(5)}" fill="${COLORS.control.fill}" stroke="${COLORS.control.stroke}" stroke-width="${sv(1.2)}"/>`;
+        s += `<rect x="${tx(cx - CTRL_W/2)}" y="${ty(b.cy - CTRL_H/2)}" width="${sv(3.5)}" height="${sv(CTRL_H)}" rx="${sv(1.5)}" fill="${COLORS.outcome.stroke}"/>`;
+        s += expText(cx, b.cy, ctrl, 10.5, COLORS.control.text, CTRL_W - 6);
+      });
+    }
+  });
+
+  // Hazard connector
+  {
+    const e = circleEdge(CX, HAZ_Y + HAZ_H, TE_R);
+    s += `<path d="M${tx(CX)} ${ty(HAZ_Y+HAZ_H)} L${tx(e.x)} ${ty(e.y)}" fill="none" stroke="#a78bfa" stroke-width="${sv(2)}" stroke-dasharray="${sv(7)} ${sv(5)}" stroke-linecap="round" marker-end="url(#aH)"/>`;
+  }
+
+  // Axis labels
+  let minLeftX = CX - 500, maxRightX = CX + 500;
+  if (tBoxes.length > 0) minLeftX = Math.min(...tBoxes.map(b => b.x));
+  if (oBoxes.length > 0) maxRightX = Math.max(...oBoxes.map(b => b.x + BOX_W));
+  const lx = minLeftX - 38, rx = maxRightX + 38;
+  s += `<text x="${tx(lx)}" y="${ty(CY)}" text-anchor="middle" dominant-baseline="central" font-size="${sv(10)}" font-family="system-ui,sans-serif" font-weight="700" letter-spacing="3" fill="rgba(96,165,250,0.4)" transform="rotate(-90, ${tx(lx)}, ${ty(CY)})">CAUSES</text>`;
+  s += `<text x="${tx(rx)}" y="${ty(CY)}" text-anchor="middle" dominant-baseline="central" font-size="${sv(10)}" font-family="system-ui,sans-serif" font-weight="700" letter-spacing="3" fill="rgba(248,113,113,0.4)" transform="rotate(-90, ${tx(rx)}, ${ty(CY)})">CONSEQUENCES</text>`;
+
+  if (tBoxes.length > 0) {
+    const prevTrackX = tBoxes[0].x + BOX_W + (tBoxes[0].apexX - tBoxes[0].x - BOX_W) / 2;
+    const labelY = CY + (Math.max(state.threats.length, state.outcomes.length, 1) * (BOX_H + BOX_GAP)) / 2 - BOX_GAP / 2;
+    s += `<text x="${tx(prevTrackX)}" y="${ty(labelY + 24)}" text-anchor="middle" dominant-baseline="central" font-size="${sv(9)}" font-family="system-ui,sans-serif" font-weight="700" letter-spacing="3" fill="rgba(96,165,250,0.55)">PREVENTATIVE BARRIERS</text>`;
+  }
+  if (oBoxes.length > 0) {
+    const recTrackX = oBoxes[0].apexX + (oBoxes[0].x - oBoxes[0].apexX) / 2;
+    const labelY = CY + (Math.max(state.threats.length, state.outcomes.length, 1) * (BOX_H + BOX_GAP)) / 2 - BOX_GAP / 2;
+    s += `<text x="${tx(recTrackX)}" y="${ty(labelY + 24)}" text-anchor="middle" dominant-baseline="central" font-size="${sv(9)}" font-family="system-ui,sans-serif" font-weight="700" letter-spacing="3" fill="rgba(248,113,113,0.55)">RECOVERY BARRIERS</text>`;
+  }
+
+  // Threat boxes
+  tBoxes.forEach(b => {
+    const hasMeta = b.likelihood || b.notes;
+    s += `<rect x="${tx(b.x)}" y="${ty(b.y)}" width="${sv(BOX_W)}" height="${sv(BOX_H)}" rx="${sv(9)}" fill="${COLORS.threat.fill}" stroke="${COLORS.threat.stroke}" stroke-width="${sv(1.5)}"/>`;
+    s += `<rect x="${tx(b.x)}" y="${(parseFloat(ty(b.y))+parseFloat(sv(8))).toFixed(2)}" width="${sv(4)}" height="${sv(BOX_H-16)}" rx="${sv(2)}" fill="${COLORS.threat.line}" opacity="0.7"/>`;
+    if (hasMeta) {
+      s += `<line x1="${tx(b.x+6)}" y1="${ty(b.y+DIVIDER_Y_OFFSET)}" x2="${tx(b.x+BOX_W-6)}" y2="${ty(b.y+DIVIDER_Y_OFFSET)}" stroke="rgba(0,0,0,0.08)" stroke-width="${sv(0.8)}"/>`;
+      s += expText(b.cx+2, b.y+LABEL_CY_OFFSET, b.label, 11.5, COLORS.threat.text, BOX_W-10);
+      if (b.likelihood) s += expChip(b.cx, b.y+CHIP_Y_OFFSET, b.likelihood, LIKELIHOOD_COLORS[b.likelihood] || '#888');
+      if (b.notes) s += expNotes(b.cx+2, b.y+NOTES_Y_OFFSET, b.notes);
+    } else {
+      s += expText(b.cx+2, b.cy, b.label, 12.5, COLORS.threat.text, BOX_W-10);
+    }
+  });
+
+  // Outcome boxes
+  oBoxes.forEach(b => {
+    const hasMeta = b.likelihood || b.severity || b.notes;
+    s += `<rect x="${tx(b.x)}" y="${ty(b.y)}" width="${sv(BOX_W)}" height="${sv(BOX_H)}" rx="${sv(9)}" fill="${COLORS.outcome.fill}" stroke="${COLORS.outcome.stroke}" stroke-width="${sv(1.5)}"/>`;
+    s += `<rect x="${(parseFloat(tx(b.x))+parseFloat(sv(BOX_W))-parseFloat(sv(4))).toFixed(2)}" y="${(parseFloat(ty(b.y))+parseFloat(sv(8))).toFixed(2)}" width="${sv(4)}" height="${sv(BOX_H-16)}" rx="${sv(2)}" fill="${COLORS.outcome.line}" opacity="0.7"/>`;
+    if (hasMeta) {
+      s += `<line x1="${tx(b.x+6)}" y1="${ty(b.y+DIVIDER_Y_OFFSET)}" x2="${tx(b.x+BOX_W-6)}" y2="${ty(b.y+DIVIDER_Y_OFFSET)}" stroke="rgba(0,0,0,0.08)" stroke-width="${sv(0.8)}"/>`;
+      s += expText(b.cx-2, b.y+LABEL_CY_OFFSET, b.label, 11.5, COLORS.outcome.text, BOX_W-10);
+      const hasBoth = b.likelihood && b.severity;
+      if (hasBoth) {
+        s += expChip(b.cx-43, b.y+CHIP_Y_OFFSET, b.likelihood, LIKELIHOOD_COLORS[b.likelihood] || '#888');
+        s += expChip(b.cx+43, b.y+CHIP_Y_OFFSET, b.severity,   SEVERITY_COLORS[b.severity]     || '#888');
+      } else {
+        if (b.likelihood) s += expChip(b.cx, b.y+CHIP_Y_OFFSET, b.likelihood, LIKELIHOOD_COLORS[b.likelihood] || '#888');
+        if (b.severity)   s += expChip(b.cx, b.y+CHIP_Y_OFFSET, b.severity,   SEVERITY_COLORS[b.severity]     || '#888');
+      }
+      if (b.notes) s += expNotes(b.cx-2, b.y+NOTES_Y_OFFSET, b.notes);
+    } else {
+      s += expText(b.cx-2, b.cy, b.label, 12.5, COLORS.outcome.text, BOX_W-10);
+    }
+  });
+
+  // Hazard box
+  s += `<text x="${tx(CX)}" y="${(parseFloat(ty(HAZ_Y))-parseFloat(sv(12))).toFixed(2)}" text-anchor="middle" font-size="${sv(9)}" font-family="system-ui,sans-serif" font-weight="700" letter-spacing="3" fill="rgba(161,97,0,0.6)">HAZARD</text>`;
+  s += `<rect x="${tx(HAZ_X)}" y="${ty(HAZ_Y)}" width="${sv(HAZ_W)}" height="${sv(HAZ_H)}" rx="${sv(10)}" fill="${COLORS.hazard.fill}" stroke="${COLORS.hazard.stroke}" stroke-width="${sv(2)}"/>`;
+  s += expText(CX, HAZ_Y+HAZ_H/2, state.hazard, 13, COLORS.hazard.text, HAZ_W);
+
+  // Top Event circle
+  s += `<circle cx="${tx(CX)}" cy="${ty(CY)}" r="${sv(TE_R+8)}" fill="rgba(167,139,250,0.09)"/>`;
+  s += `<circle cx="${tx(CX)}" cy="${ty(CY)}" r="${sv(TE_R)}" fill="${COLORS.te.fill}" stroke="${COLORS.te.stroke}" stroke-width="${sv(2)}"/>`;
+  s += `<text x="${tx(CX)}" y="${(parseFloat(ty(CY))-parseFloat(sv(TE_R))-parseFloat(sv(13))).toFixed(2)}" text-anchor="middle" font-size="${sv(9)}" font-family="system-ui,sans-serif" font-weight="700" letter-spacing="3" fill="rgba(124,58,237,0.55)">TOP EVENT</text>`;
+
+  const hasTEmeta = state.topEventLikelihood || state.topEventNotes;
+  s += expText(CX, hasTEmeta ? CY - 22 : CY, state.topEvent, 13.5, COLORS.te.text, TE_R*1.72);
+  if (state.topEventLikelihood) {
+    s += expChip(CX, CY + 12, state.topEventLikelihood, LIKELIHOOD_COLORS[state.topEventLikelihood] || '#888');
+  }
+  if (state.topEventNotes) s += expNotes(CX, CY + 32, state.topEventNotes);
+
+  s += '</svg>';
+  return s;
+}
+
+function escXML(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPORT / IMPORT — JSON DATA
+// ═══════════════════════════════════════════════════════
+document.getElementById('btn-save-json').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.download = 'bowtie-risk-data.json'; a.href = url; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+});
+
+document.getElementById('btn-load-json').addEventListener('click', () => {
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file'; fileInput.accept = '.json';
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const parsed = JSON.parse(event.target.value || event.target.result);
+        if (parsed && typeof parsed === 'object') {
+          state = parsed;
+          normaliseState(state);
+          initSelects();
+          refreshSidebar();
+          render();
+          fitView();
+        } else { alert('Invalid file format: Object structure expected.'); }
+      } catch (err) { alert('Failed to parse file: Invalid JSON.'); }
+    };
+    reader.readAsText(file);
+  });
+  fileInput.click();
+});
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+initSelects();
+refreshSidebar();
+render();
+requestAnimationFrame(() => requestAnimationFrame(fitView));
+</script>
+</body>
+</html>
