@@ -13,6 +13,7 @@
   --sb-surface2:#1c2030;
   --sb-border:#252a3a;
   --sb-border2:#2f3650;
+  --sb-divider:#454a5a;
   --sb-text:#e4e8f7;
   --sb-muted:#6b7494;
   --sb-accent:#5b8ef0;
@@ -130,19 +131,19 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:fl
 .meta-notes{font-style:italic}
 .meta-notes::placeholder{color:var(--sb-muted)}
 
-/* ── CONTROLS SUB-LIST ──────────────────────────────── */
-.controls-container{
+/* ── BARRIERS SUB-LIST ──────────────────────────────── */
+.barriers-container{
   margin:4px 0 12px 24px;
   display:flex;
   flex-direction:column;
   gap:4px;
 }
-.control-row{
+.barrier-row{
   display:flex;
   align-items:center;
   gap:4px;
 }
-.control-row input{
+.barrier-row input{
   flex:1;
   background:rgba(20,24,36,0.6);
   border:1px solid var(--sb-border2);
@@ -152,7 +153,7 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:fl
   color:var(--sb-text);
   outline:none;
 }
-.control-row input:focus{border-color:var(--sb-accent)}
+.barrier-row input:focus{border-color:var(--sb-accent)}
 .btn-add-ctrl{
   align-self:flex-start;
   margin-left:24px;
@@ -194,7 +195,7 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:fl
 }
 .btn-add:hover{border-color:var(--sb-accent);color:var(--sb-accent);background:rgba(91,142,240,0.04)}
 
-.divider{height:1px;background:var(--sb-border);margin:4px -16px 16px}
+.divider{height:2px;background:var(--sb-divider);margin:4px -16px 16px}
 
 #sidebar-footer{
   padding:12px 16px;
@@ -283,16 +284,16 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:fl
   "topEventLikelihood": "Possible",
   "topEventNotes": "Based on historical incident data",
   "threats": [
-    { "label": "Valve Failure", "controls": ["Routine Inspection", "Overpressure Cap"], "likelihood": "Unlikely", "notes": "Monthly inspection regime in place" },
-    { "label": "Operator Error", "controls": ["Staff Training"], "likelihood": "Possible", "notes": "Human factors assessment underway" },
-    { "label": "Corrosion / Degradation", "controls": ["Ultrasonic Testing"], "likelihood": "Rare", "notes": "" },
-    { "label": "Overpressure Event", "controls": ["Burst Disc Setup"], "likelihood": "Rare", "notes": "" }
+    { "label": "Valve Failure", "barriers": ["Routine Inspection", "Overpressure Cap"], "likelihood": "Unlikely", "notes": "Monthly inspection regime in place" },
+    { "label": "Operator Error", "barriers": ["Staff Training"], "likelihood": "Possible", "notes": "Human factors assessment underway" },
+    { "label": "Corrosion / Degradation", "barriers": ["Ultrasonic Testing"], "likelihood": "Rare", "notes": "" },
+    { "label": "Overpressure Event", "barriers": ["Burst Disc Setup"], "likelihood": "Rare", "notes": "" }
   ],
-  "outcomes": [
-    { "label": "Fire or Explosion", "controls": ["Deluge System"], "likelihood": "Unlikely", "severity": "Catastrophic", "notes": "Fatality risk within 50m radius" },
-    { "label": "Toxic Gas Release", "controls": ["Scrubber System", "PPE Zone"], "likelihood": "Possible", "severity": "Major", "notes": "" },
-    { "label": "Environmental Damage", "controls": ["Bund Wall Catchment"], "likelihood": "Likely", "severity": "Moderate", "notes": "" },
-    { "label": "Personnel Injury", "controls": ["Evacuation Plan"], "likelihood": "Unlikely", "severity": "Major", "notes": "" }
+  "consequences": [
+    { "label": "Fire or Explosion", "barriers": ["Deluge System"], "likelihood": "Unlikely", "severity": "Catastrophic", "notes": "Fatality risk within 50m radius" },
+    { "label": "Toxic Gas Release", "barriers": ["Scrubber System", "PPE Zone"], "likelihood": "Possible", "severity": "Major", "notes": "" },
+    { "label": "Environmental Damage", "barriers": ["Bund Wall Catchment"], "likelihood": "Likely", "severity": "Moderate", "notes": "" },
+    { "label": "Personnel Injury", "barriers": ["Evacuation Plan"], "likelihood": "Unlikely", "severity": "Major", "notes": "" }
   ]
 }
 </script>
@@ -338,7 +339,7 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:fl
 
     <div class="section">
       <div class="sec-label">
-        <span class="sec-dot" style="background:#7ab8f5"></span>Threats &amp; Preventative Controls
+        <span class="sec-dot" style="background:#7ab8f5"></span>Threats &amp; Preventative Barriers
       </div>
       <div class="item-list" id="threats-list"></div>
       <button class="btn-add" id="btn-add-threat">
@@ -346,15 +347,17 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:fl
         Add Threat
       </button>
     </div>
+    
+    <div class="divider"></div>
 
     <div class="section">
       <div class="sec-label">
-        <span class="sec-dot" style="background:#f09898"></span>Outcomes &amp; Recovery Controls
+        <span class="sec-dot" style="background:#f09898"></span>Consequences &amp; Recovery Barriers
       </div>
-      <div class="item-list" id="outcomes-list"></div>
-      <button class="btn-add" id="btn-add-outcome">
+      <div class="item-list" id="consequences-list"></div>
+      <button class="btn-add" id="btn-add-consequence">
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><line x1="6" y1="1" x2="6" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="1" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        Add Outcome
+        Add Consequence
       </button>
     </div>
 
@@ -373,7 +376,7 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:fl
     </div>
     <button class="btn-export btn-danger" id="btn-clear" style="margin-bottom:2px">
       <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 3h9M5 3V2h3v1M3.5 3l.5 8h5l.5-8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 5.5v4M7.5 5.5v4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-      Clear Causes &amp; Consequences
+      Clear Threats &amp; Consequences
     </button>
     <div class="footer-row">
       <button class="btn-export btn-ghost" id="btn-save-json">
@@ -442,20 +445,20 @@ let state = _savedState || _seedState;
 
 function normaliseState(s) {
   if (s.threats && s.threats.length && typeof s.threats[0] === 'string')
-    s.threats = s.threats.map(t => ({ label: t, controls: [] }));
-  if (s.outcomes && s.outcomes.length && typeof s.outcomes[0] === 'string')
-    s.outcomes = s.outcomes.map(o => ({ label: o, controls: [] }));
+    s.threats = s.threats.map(t => ({ label: t, barriers: [] }));
+  if (s.consequences && s.consequences.length && typeof s.consequences[0] === 'string')
+    s.consequences = s.consequences.map(o => ({ label: o, barriers: [] }));
   if (!s.threats)  s.threats  = [];
-  if (!s.outcomes) s.outcomes = [];
+  if (!s.consequences) s.consequences = [];
   if (!s.topEventLikelihood) s.topEventLikelihood = '';
   if (!s.topEventNotes)      s.topEventNotes      = '';
   s.threats.forEach(t => {
-    if (!t.controls)   t.controls   = [];
+    if (!t.barriers)   t.barriers   = [];
     if (t.likelihood === undefined) t.likelihood = '';
     if (!t.notes)      t.notes      = '';
   });
-  s.outcomes.forEach(o => {
-    if (!o.controls)   o.controls   = [];
+  s.consequences.forEach(o => {
+    if (!o.barriers)   o.barriers   = [];
     if (o.likelihood === undefined) o.likelihood = '';
     if (o.severity   === undefined) o.severity   = '';
     if (!o.notes)      o.notes      = '';
@@ -487,11 +490,11 @@ const CHIP_Y_OFFSET    = 63;   // chip(s) centre
 const NOTES_Y_OFFSET   = 78;   // notes text centre
 
 const COLORS = {
-  threat:  { fill:'#dbeafe', stroke:'#93c5fd', text:'#1e3a8a', line:'#60a5fa' },
-  outcome: { fill:'#fee2e2', stroke:'#fca5a5', text:'#7f1d1d', line:'#f87171' },
-  hazard:  { fill:'#fef9c3', stroke:'#fde047', text:'#78350f', line:'#a78bfa' },
-  te:      { fill:'#ede9fe', stroke:'#c4b5fd', text:'#3b0764' },
-  control: { fill:'#ffffff', stroke:'#6b7494', text:'#1f2937' }
+  threat:      { fill:'#dbeafe', stroke:'#93c5fd', text:'#1e3a8a', line:'#60a5fa' },
+  consequence: { fill:'#fee2e2', stroke:'#fca5a5', text:'#7f1d1d', line:'#f87171' },
+  hazard:      { fill:'#fef9c3', stroke:'#fde047', text:'#78350f', line:'#a78bfa' },
+  te:          { fill:'#ede9fe', stroke:'#c4b5fd', text:'#3b0764' },
+  barrier:     { fill:'#ffffff', stroke:'#6b7494', text:'#1f2937' }
 };
 
 // ═══════════════════════════════════════════════════════
@@ -520,8 +523,8 @@ function zoomAt(cx, cy, factor) {
 
 function fitView() {
   const tBoxes = boxPositions(state.threats, true);
-  const oBoxes = boxPositions(state.outcomes, false);
-  const n = Math.max(state.threats.length, state.outcomes.length, 1);
+  const oBoxes = boxPositions(state.consequences, false);
+  const n = Math.max(state.threats.length, state.consequences.length, 1);
   const totalH = n * BOX_H + (n - 1) * BOX_GAP;
   const pad = 100;
 
@@ -683,7 +686,7 @@ function boxPositions(items, isLeft) {
   const startY = CY - totalH / 2;
 
   let maxCtrl = 0;
-  items.forEach(item => { if (item.controls && item.controls.length > maxCtrl) maxCtrl = item.controls.length; });
+  items.forEach(item => { if (item.barriers && item.barriers.length > maxCtrl) maxCtrl = item.barriers.length; });
 
   const lengthOfHorzLine = (END_BUFFER * 2) + ((CTRL_W + CTRL_GAP) * maxCtrl);
   const innerAnchorDistance = TE_R + 40;
@@ -694,7 +697,7 @@ function boxPositions(items, isLeft) {
     const y = startY + i * (BOX_H + BOX_GAP);
     return {
       label:      item.label,
-      controls:   item.controls || [],
+      barriers:   item.barriers || [],
       likelihood: item.likelihood || '',
       severity:   item.severity  || '',
       notes:      item.notes     || '',
@@ -718,12 +721,12 @@ function render() {
 
   const defs = el('defs');
   makeMarker(defs, 'arr-t', COLORS.threat.line);
-  makeMarker(defs, 'arr-o', COLORS.outcome.line);
+  makeMarker(defs, 'arr-o', COLORS.consequence.line);
   makeMarker(defs, 'arr-h', '#a78bfa');
   wld.appendChild(defs);
 
   const tBoxes = boxPositions(state.threats, true);
-  const oBoxes = boxPositions(state.outcomes, false);
+  const oBoxes = boxPositions(state.consequences, false);
   const HAZ_Y  = computeHAZ_Y(tBoxes, oBoxes);
   const HAZ_X  = CX - HAZ_W / 2;
 
@@ -747,7 +750,7 @@ function render() {
     }));
   }
 
-  // ── Threat lines & controls ─────────────────────────
+  // ── Threat lines & barriers ─────────────────────────
   tBoxes.forEach(box => {
     const edge = circleEdge(box.apexX, box.cy, TE_R);
     wld.appendChild(el('path', {
@@ -756,27 +759,27 @@ function render() {
       'marker-end':'url(#arr-t)'
     }));
     wld.appendChild(el('circle', { cx:box.apexX, cy:box.cy, r:'3.5', fill:COLORS.threat.line, opacity:'0.5' }));
-    if (box.controls.length > 0) {
+    if (box.barriers.length > 0) {
       const startX = box.x + BOX_W + END_BUFFER + (CTRL_W / 2);
-      box.controls.forEach((ctrl, cIdx) => {
-        renderControlBlock(startX + cIdx * (CTRL_W + CTRL_GAP), box.cy, ctrl, COLORS.threat.stroke);
+      box.barriers.forEach((ctrl, cIdx) => {
+        renderBarrierBlock(startX + cIdx * (CTRL_W + CTRL_GAP), box.cy, ctrl, COLORS.threat.stroke);
       });
     }
   });
 
-  // ── Outcome lines & controls ────────────────────────
+  // ── Consequence lines & barriers ────────────────────────
   oBoxes.forEach(box => {
     const edge = circleEdge(box.apexX, box.cy, TE_R);
     wld.appendChild(el('path', {
       d:`M${edge.x} ${edge.y} L${box.apexX} ${box.cy} H${box.x}`,
-      fill:'none', stroke:COLORS.outcome.line, 'stroke-width':'2', 'stroke-linecap':'round', 'stroke-linejoin':'round',
+      fill:'none', stroke:COLORS.consequence.line, 'stroke-width':'2', 'stroke-linecap':'round', 'stroke-linejoin':'round',
       'marker-end':'url(#arr-o)'
     }));
-    wld.appendChild(el('circle', { cx:box.apexX, cy:box.cy, r:'3.5', fill:COLORS.outcome.line, opacity:'0.5' }));
-    if (box.controls.length > 0) {
+    wld.appendChild(el('circle', { cx:box.apexX, cy:box.cy, r:'3.5', fill:COLORS.consequence.line, opacity:'0.5' }));
+    if (box.barriers.length > 0) {
       const startX = box.apexX + END_BUFFER + (CTRL_W / 2);
-      box.controls.forEach((ctrl, cIdx) => {
-        renderControlBlock(startX + cIdx * (CTRL_W + CTRL_GAP), box.cy, ctrl, COLORS.outcome.stroke);
+      box.barriers.forEach((ctrl, cIdx) => {
+        renderBarrierBlock(startX + cIdx * (CTRL_W + CTRL_GAP), box.cy, ctrl, COLORS.consequence.stroke);
       });
     }
   });
@@ -796,7 +799,7 @@ function render() {
   if (oBoxes.length > 0) maxRightX = Math.max(...oBoxes.map(b => b.x + BOX_W));
 
   const lx = minLeftX - 38, rx = maxRightX + 38;
-  [{x:lx,label:'CAUSES',fill:'rgba(96,165,250,0.4)'},{x:rx,label:'CONSEQUENCES',fill:'rgba(248,113,113,0.4)'}].forEach(({x,label,fill}) => {
+  [{x:lx,label:'THREATS',fill:'rgba(96,165,250,0.4)'},{x:rx,label:'CONSEQUENCES',fill:'rgba(248,113,113,0.4)'}].forEach(({x,label,fill}) => {
     const t = el('text', { x, y:CY, 'text-anchor':'middle', 'dominant-baseline':'central', 'font-size':'10', 'font-family':"system-ui,sans-serif", 'font-weight':'700', 'letter-spacing':'3', fill, transform:`rotate(-90, ${x}, ${CY})` });
     t.textContent = label;
     wld.appendChild(t);
@@ -804,14 +807,14 @@ function render() {
 
   if (tBoxes.length > 0) {
     const trackX = tBoxes[0].x + BOX_W + (tBoxes[0].apexX - tBoxes[0].x - BOX_W) / 2;
-    const labelY  = CY + (Math.max(state.threats.length, state.outcomes.length, 1) * (BOX_H + BOX_GAP)) / 2 - BOX_GAP / 2;
+    const labelY  = CY + (Math.max(state.threats.length, state.consequences.length, 1) * (BOX_H + BOX_GAP)) / 2 - BOX_GAP / 2;
     const t = el('text', { x:trackX, y:labelY + 24, 'text-anchor':'middle', 'dominant-baseline':'central', 'font-size':'9', 'font-family':"system-ui,sans-serif", 'font-weight':'700', 'letter-spacing':'3', fill:'rgba(96,165,250,0.55)' });
     t.textContent = 'PREVENTATIVE BARRIERS';
     wld.appendChild(t);
   }
   if (oBoxes.length > 0) {
     const trackX = oBoxes[0].apexX + (oBoxes[0].x - oBoxes[0].apexX) / 2;
-    const labelY  = CY + (Math.max(state.threats.length, state.outcomes.length, 1) * (BOX_H + BOX_GAP)) / 2 - BOX_GAP / 2;
+    const labelY  = CY + (Math.max(state.threats.length, state.consequences.length, 1) * (BOX_H + BOX_GAP)) / 2 - BOX_GAP / 2;
     const t = el('text', { x:trackX, y:labelY + 24, 'text-anchor':'middle', 'dominant-baseline':'central', 'font-size':'9', 'font-family':"system-ui,sans-serif", 'font-weight':'700', 'letter-spacing':'3', fill:'rgba(248,113,113,0.55)' });
     t.textContent = 'RECOVERY BARRIERS';
     wld.appendChild(t);
@@ -837,15 +840,15 @@ function render() {
     wld.appendChild(g);
   });
 
-  // ── Outcome boxes ───────────────────────────────────
+  // ── Consequence boxes ───────────────────────────────────
   oBoxes.forEach(box => {
     const g = el('g');
     const hasMeta = box.likelihood || box.severity || box.notes;
-    g.appendChild(el('rect', { x:box.x, y:box.y, width:BOX_W, height:BOX_H, rx:'9', fill:COLORS.outcome.fill, stroke:COLORS.outcome.stroke, 'stroke-width':'1.5' }));
-    g.appendChild(el('rect', { x:box.x + BOX_W - 4, y:box.y + 8, width:'4', height:BOX_H - 16, rx:'2', fill:COLORS.outcome.line, opacity:'0.7' }));
+    g.appendChild(el('rect', { x:box.x, y:box.y, width:BOX_W, height:BOX_H, rx:'9', fill:COLORS.consequence.fill, stroke:COLORS.consequence.stroke, 'stroke-width':'1.5' }));
+    g.appendChild(el('rect', { x:box.x + BOX_W - 4, y:box.y + 8, width:'4', height:BOX_H - 16, rx:'2', fill:COLORS.consequence.line, opacity:'0.7' }));
     if (hasMeta) {
       g.appendChild(el('line', { x1:box.x+6, y1:box.y+DIVIDER_Y_OFFSET, x2:box.x+BOX_W-6, y2:box.y+DIVIDER_Y_OFFSET, stroke:'rgba(0,0,0,0.08)', 'stroke-width':'0.8' }));
-      addText(g, box.cx - 2, box.y + LABEL_CY_OFFSET, box.label, 11.5, COLORS.outcome.text, BOX_W - 10);
+      addText(g, box.cx - 2, box.y + LABEL_CY_OFFSET, box.label, 11.5, COLORS.consequence.text, BOX_W - 10);
       const hasBoth = box.likelihood && box.severity;
       if (hasBoth) {
         renderMetaBadge(g, box.cx - 43, box.y + CHIP_Y_OFFSET, box.likelihood, LIKELIHOOD_COLORS[box.likelihood] || '#888');
@@ -856,7 +859,7 @@ function render() {
       }
       if (box.notes) renderNotesText(g, box.cx - 2, box.y + NOTES_Y_OFFSET, box.notes);
     } else {
-      addText(g, box.cx - 2, box.cy, box.label, 12.5, COLORS.outcome.text, BOX_W - 10);
+      addText(g, box.cx - 2, box.cy, box.label, 12.5, COLORS.consequence.text, BOX_W - 10);
     }
     wld.appendChild(g);
   });
@@ -897,21 +900,21 @@ function render() {
   saveState();
 }
 
-function renderControlBlock(cx, cy, label, accentColor) {
+function renderBarrierBlock(cx, cy, label, accentColor) {
   const x = cx - CTRL_W / 2, y = cy - CTRL_H / 2;
   const g = el('g');
-  g.appendChild(el('rect', { x, y, width:CTRL_W, height:CTRL_H, rx:5, fill:COLORS.control.fill, stroke:COLORS.control.stroke, 'stroke-width':'1.2' }));
+  g.appendChild(el('rect', { x, y, width:CTRL_W, height:CTRL_H, rx:5, fill:COLORS.barrier.fill, stroke:COLORS.barrier.stroke, 'stroke-width':'1.2' }));
   g.appendChild(el('rect', { x, y, width:'3.5', height:CTRL_H, rx:'1.5', fill:accentColor }));
-  addText(g, cx + 2, cy, label, 10.5, COLORS.control.text, CTRL_W - 6);
+  addText(g, cx + 2, cy, label, 10.5, COLORS.barrier.text, CTRL_W - 6);
   wld.appendChild(g);
 }
 
 function updateStatus() {
   const s = document.getElementById('status');
   let tc = 0, oc = 0;
-  state.threats.forEach(t => tc += (t.controls || []).length);
-  state.outcomes.forEach(o => oc += (o.controls || []).length);
-  if (s) s.textContent = `${state.threats.length} threats (${tc} controls) · ${state.outcomes.length} outcomes (${oc} controls)`;
+  state.threats.forEach(t => tc += (t.barriers || []).length);
+  state.consequences.forEach(o => oc += (o.barriers || []).length);
+  if (s) s.textContent = `${state.threats.length} threats (${tc} barriers) · ${state.consequences.length} consequences (${oc} barriers)`;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -951,7 +954,7 @@ function buildList(containerId, items, key) {
     const inp = document.createElement('input');
     inp.type = 'text';
     inp.value = item.label;
-    inp.placeholder = key === 'threats' ? 'Threat / cause…' : 'Outcome / consequence…';
+    inp.placeholder = key === 'threats' ? 'Threat…' : 'Consequence…';
     inp.addEventListener('input', () => { state[key][i].label = inp.value; render(); });
 
     const del = document.createElement('button');
@@ -973,8 +976,8 @@ function buildList(containerId, items, key) {
     likRow.appendChild(likLbl); likRow.appendChild(likSel);
     parentRow.appendChild(likRow);
 
-    // ── Severity (outcomes only) ──
-    if (key === 'outcomes') {
+    // ── Severity (consequences only) ──
+    if (key === 'consequences') {
       const sevRow = document.createElement('div');
       sevRow.className = 'meta-row';
       const sevLbl = document.createElement('span');
@@ -1000,29 +1003,29 @@ function buildList(containerId, items, key) {
     notesRow.appendChild(notesLbl); notesRow.appendChild(notesInp);
     parentRow.appendChild(notesRow);
 
-    // ── Controls ──
+    // ── Barriers ──
     const ctrlContainer = document.createElement('div');
-    ctrlContainer.className = 'controls-container';
-    if (!item.controls) item.controls = [];
-    item.controls.forEach((ctrl, cIdx) => {
+    ctrlContainer.className = 'barriers-container';
+    if (!item.barriers) item.barriers = [];
+    item.barriers.forEach((ctrl, cIdx) => {
       const cRow = document.createElement('div');
-      cRow.className = 'control-row';
+      cRow.className = 'barrier-row';
       const cInp = document.createElement('input');
-      cInp.type = 'text'; cInp.value = ctrl; cInp.placeholder = 'Barrier control element…';
-      cInp.addEventListener('input', () => { state[key][i].controls[cIdx] = cInp.value; render(); });
+      cInp.type = 'text'; cInp.value = ctrl; cInp.placeholder = 'Barrier…';
+      cInp.addEventListener('input', () => { state[key][i].barriers[cIdx] = cInp.value; render(); });
       const cDel = document.createElement('button');
       cDel.className = 'btn-del';
       cDel.style.width = '20px'; cDel.style.height = '20px'; cDel.style.fontSize = '11px';
       cDel.innerHTML = '×';
-      cDel.addEventListener('click', () => { state[key][i].controls.splice(cIdx, 1); buildList(containerId, state[key], key); render(); });
+      cDel.addEventListener('click', () => { state[key][i].barriers.splice(cIdx, 1); buildList(containerId, state[key], key); render(); });
       cRow.appendChild(cInp); cRow.appendChild(cDel);
       ctrlContainer.appendChild(cRow);
     });
 
     const btnAddCtrl = document.createElement('button');
     btnAddCtrl.className = 'btn-add-ctrl';
-    btnAddCtrl.innerHTML = `<span>+</span> Add ${key === 'threats' ? 'Preventative' : 'Recovery'} Control`;
-    btnAddCtrl.addEventListener('click', () => { state[key][i].controls.push('New Control'); buildList(containerId, state[key], key); render(); });
+    btnAddCtrl.innerHTML = `<span>+</span> Add ${key === 'threats' ? 'Preventative' : 'Recovery'} Barrier`;
+    btnAddCtrl.addEventListener('click', () => { state[key][i].barriers.push('New Barrier'); buildList(containerId, state[key], key); render(); });
 
     parentRow.appendChild(ctrlContainer);
     parentRow.appendChild(btnAddCtrl);
@@ -1045,7 +1048,7 @@ function refreshSidebar() {
   document.getElementById('sel-te-likelihood').value = state.topEventLikelihood || '';
   document.getElementById('inp-te-notes').value       = state.topEventNotes      || '';
   buildList('threats-list',  state.threats,  'threats');
-  buildList('outcomes-list', state.outcomes, 'outcomes');
+  buildList('consequences-list', state.consequences, 'consequences');
 }
 
 document.getElementById('inp-hazard').addEventListener('input', e => { state.hazard = e.target.value; render(); });
@@ -1054,18 +1057,18 @@ document.getElementById('sel-te-likelihood').addEventListener('change', e => { s
 document.getElementById('inp-te-notes').addEventListener('input', e => { state.topEventNotes = e.target.value; render(); });
 
 document.getElementById('btn-add-threat').addEventListener('click', () => {
-  state.threats.push({ label: 'New Threat', controls: [], likelihood: '', notes: '' });
+  state.threats.push({ label: 'New Threat', barriers: [], likelihood: '', notes: '' });
   buildList('threats-list', state.threats, 'threats');
   render();
   const inputs = document.querySelectorAll('#threats-list .item-row input');
   if (inputs.length) { inputs[inputs.length-1].focus(); inputs[inputs.length-1].select(); }
 });
 
-document.getElementById('btn-add-outcome').addEventListener('click', () => {
-  state.outcomes.push({ label: 'New Outcome', controls: [], likelihood: '', severity: '', notes: '' });
-  buildList('outcomes-list', state.outcomes, 'outcomes');
+document.getElementById('btn-add-consequence').addEventListener('click', () => {
+  state.consequences.push({ label: 'New Consequence', barriers: [], likelihood: '', severity: '', notes: '' });
+  buildList('consequences-list', state.consequences, 'consequences');
   render();
-  const inputs = document.querySelectorAll('#outcomes-list .item-row input');
+  const inputs = document.querySelectorAll('#consequences-list .item-row input');
   if (inputs.length) { inputs[inputs.length-1].focus(); inputs[inputs.length-1].select(); }
 });
 
@@ -1075,10 +1078,10 @@ document.getElementById('btn-add-outcome').addEventListener('click', () => {
 document.getElementById('btn-png').addEventListener('click', () => {
   const PAD = 90, SCALE = 2.5;
   const tBoxes = boxPositions(state.threats, true);
-  const oBoxes = boxPositions(state.outcomes, false);
+  const oBoxes = boxPositions(state.consequences, false);
   const HAZ_Y  = computeHAZ_Y(tBoxes, oBoxes);
 
-  const n = Math.max(state.threats.length, state.outcomes.length, 1);
+  const n = Math.max(state.threats.length, state.consequences.length, 1);
   const totalH = n * BOX_H + (n - 1) * BOX_GAP;
 
   let minX = CX - 600, maxX = CX + 600;
@@ -1119,7 +1122,7 @@ function buildExportSVG(ox, oy, W, H, sc) {
   const sv = v => (v * sc).toFixed(2);
 
   const tBoxes = boxPositions(state.threats, true);
-  const oBoxes = boxPositions(state.outcomes, false);
+  const oBoxes = boxPositions(state.consequences, false);
   const HAZ_Y  = computeHAZ_Y(tBoxes, oBoxes);
   const HAZ_X  = CX - HAZ_W / 2;
 
@@ -1163,7 +1166,7 @@ function buildExportSVG(ox, oy, W, H, sc) {
   }
 
   let s = `<svg xmlns="http://www.w3.org/2000/svg" width="${(W*sc).toFixed(0)}" height="${(H*sc).toFixed(0)}">`;
-  s += `<defs>${arrowMarker('aT',COLORS.threat.line)}${arrowMarker('aO',COLORS.outcome.line)}${arrowMarker('aH','#a78bfa')}</defs>`;
+  s += `<defs>${arrowMarker('aT',COLORS.threat.line)}${arrowMarker('aO',COLORS.consequence.line)}${arrowMarker('aH','#a78bfa')}</defs>`;
 
   // Wing fills
   if (tBoxes.length > 0) {
@@ -1179,34 +1182,34 @@ function buildExportSVG(ox, oy, W, H, sc) {
     s += `<polygon points="${tx(top.apexX)},${ty(top.cy)} ${tx(bot.apexX)},${ty(bot.cy)} ${tx(ec2.x)},${ty(ec2.y)} ${tx(midCE.x)},${ty(midCE.y)} ${tx(ec1.x)},${ty(ec1.y)}" fill="rgba(252,165,165,0.06)" stroke="none"/>`;
   }
 
-  // Threat lines & controls
+  // Threat lines & barriers
   tBoxes.forEach(b => {
     const e = circleEdge(b.apexX, b.cy, TE_R);
     s += `<path d="M${tx(b.x + BOX_W)} ${ty(b.cy)} H${tx(b.apexX)} L${tx(e.x)} ${ty(e.y)}" fill="none" stroke="${COLORS.threat.line}" stroke-width="${sv(2)}" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#aT)"/>`;
     s += `<circle cx="${tx(b.apexX)}" cy="${ty(b.cy)}" r="${sv(3.5)}" fill="${COLORS.threat.line}" opacity="0.5"/>`;
-    if (b.controls.length > 0) {
+    if (b.barriers.length > 0) {
       const startX = b.x + BOX_W + END_BUFFER + CTRL_W / 2;
-      b.controls.forEach((ctrl, cIdx) => {
+      b.barriers.forEach((ctrl, cIdx) => {
         const cx = startX + cIdx * (CTRL_W + CTRL_GAP);
-        s += `<rect x="${tx(cx - CTRL_W/2)}" y="${ty(b.cy - CTRL_H/2)}" width="${sv(CTRL_W)}" height="${sv(CTRL_H)}" rx="${sv(5)}" fill="${COLORS.control.fill}" stroke="${COLORS.control.stroke}" stroke-width="${sv(1.2)}"/>`;
+        s += `<rect x="${tx(cx - CTRL_W/2)}" y="${ty(b.cy - CTRL_H/2)}" width="${sv(CTRL_W)}" height="${sv(CTRL_H)}" rx="${sv(5)}" fill="${COLORS.barrier.fill}" stroke="${COLORS.barrier.stroke}" stroke-width="${sv(1.2)}"/>`;
         s += `<rect x="${tx(cx - CTRL_W/2)}" y="${ty(b.cy - CTRL_H/2)}" width="${sv(3.5)}" height="${sv(CTRL_H)}" rx="${sv(1.5)}" fill="${COLORS.threat.stroke}"/>`;
-        s += expText(cx, b.cy, ctrl, 10.5, COLORS.control.text, CTRL_W - 6);
+        s += expText(cx, b.cy, ctrl, 10.5, COLORS.barrier.text, CTRL_W - 6);
       });
     }
   });
 
-  // Outcome lines & controls
+  // Consequence lines & barriers
   oBoxes.forEach(b => {
     const e = circleEdge(b.apexX, b.cy, TE_R);
-    s += `<path d="M${tx(e.x)} ${ty(e.y)} L${tx(b.apexX)} ${ty(b.cy)} H${tx(b.x)}" fill="none" stroke="${COLORS.outcome.line}" stroke-width="${sv(2)}" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#aO)"/>`;
-    s += `<circle cx="${tx(b.apexX)}" cy="${ty(b.cy)}" r="${sv(3.5)}" fill="${COLORS.outcome.line}" opacity="0.5"/>`;
-    if (b.controls.length > 0) {
+    s += `<path d="M${tx(e.x)} ${ty(e.y)} L${tx(b.apexX)} ${ty(b.cy)} H${tx(b.x)}" fill="none" stroke="${COLORS.consequence.line}" stroke-width="${sv(2)}" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#aO)"/>`;
+    s += `<circle cx="${tx(b.apexX)}" cy="${ty(b.cy)}" r="${sv(3.5)}" fill="${COLORS.consequence.line}" opacity="0.5"/>`;
+    if (b.barriers.length > 0) {
       const startX = b.apexX + END_BUFFER + CTRL_W / 2;
-      b.controls.forEach((ctrl, cIdx) => {
+      b.barriers.forEach((ctrl, cIdx) => {
         const cx = startX + cIdx * (CTRL_W + CTRL_GAP);
-        s += `<rect x="${tx(cx - CTRL_W/2)}" y="${ty(b.cy - CTRL_H/2)}" width="${sv(CTRL_W)}" height="${sv(CTRL_H)}" rx="${sv(5)}" fill="${COLORS.control.fill}" stroke="${COLORS.control.stroke}" stroke-width="${sv(1.2)}"/>`;
-        s += `<rect x="${tx(cx - CTRL_W/2)}" y="${ty(b.cy - CTRL_H/2)}" width="${sv(3.5)}" height="${sv(CTRL_H)}" rx="${sv(1.5)}" fill="${COLORS.outcome.stroke}"/>`;
-        s += expText(cx, b.cy, ctrl, 10.5, COLORS.control.text, CTRL_W - 6);
+        s += `<rect x="${tx(cx - CTRL_W/2)}" y="${ty(b.cy - CTRL_H/2)}" width="${sv(CTRL_W)}" height="${sv(CTRL_H)}" rx="${sv(5)}" fill="${COLORS.barrier.fill}" stroke="${COLORS.barrier.stroke}" stroke-width="${sv(1.2)}"/>`;
+        s += `<rect x="${tx(cx - CTRL_W/2)}" y="${ty(b.cy - CTRL_H/2)}" width="${sv(3.5)}" height="${sv(CTRL_H)}" rx="${sv(1.5)}" fill="${COLORS.consequence.stroke}"/>`;
+        s += expText(cx, b.cy, ctrl, 10.5, COLORS.barrier.text, CTRL_W - 6);
       });
     }
   });
@@ -1222,17 +1225,17 @@ function buildExportSVG(ox, oy, W, H, sc) {
   if (tBoxes.length > 0) minLeftX = Math.min(...tBoxes.map(b => b.x));
   if (oBoxes.length > 0) maxRightX = Math.max(...oBoxes.map(b => b.x + BOX_W));
   const lx = minLeftX - 38, rx = maxRightX + 38;
-  s += `<text x="${tx(lx)}" y="${ty(CY)}" text-anchor="middle" dominant-baseline="central" font-size="${sv(10)}" font-family="system-ui,sans-serif" font-weight="700" letter-spacing="3" fill="rgba(96,165,250,0.4)" transform="rotate(-90, ${tx(lx)}, ${ty(CY)})">CAUSES</text>`;
+  s += `<text x="${tx(lx)}" y="${ty(CY)}" text-anchor="middle" dominant-baseline="central" font-size="${sv(10)}" font-family="system-ui,sans-serif" font-weight="700" letter-spacing="3" fill="rgba(96,165,250,0.4)" transform="rotate(-90, ${tx(lx)}, ${ty(CY)})">THREATS</text>`;
   s += `<text x="${tx(rx)}" y="${ty(CY)}" text-anchor="middle" dominant-baseline="central" font-size="${sv(10)}" font-family="system-ui,sans-serif" font-weight="700" letter-spacing="3" fill="rgba(248,113,113,0.4)" transform="rotate(-90, ${tx(rx)}, ${ty(CY)})">CONSEQUENCES</text>`;
 
   if (tBoxes.length > 0) {
     const prevTrackX = tBoxes[0].x + BOX_W + (tBoxes[0].apexX - tBoxes[0].x - BOX_W) / 2;
-    const labelY = CY + (Math.max(state.threats.length, state.outcomes.length, 1) * (BOX_H + BOX_GAP)) / 2 - BOX_GAP / 2;
+    const labelY = CY + (Math.max(state.threats.length, state.consequences.length, 1) * (BOX_H + BOX_GAP)) / 2 - BOX_GAP / 2;
     s += `<text x="${tx(prevTrackX)}" y="${ty(labelY + 24)}" text-anchor="middle" dominant-baseline="central" font-size="${sv(9)}" font-family="system-ui,sans-serif" font-weight="700" letter-spacing="3" fill="rgba(96,165,250,0.55)">PREVENTATIVE BARRIERS</text>`;
   }
   if (oBoxes.length > 0) {
     const recTrackX = oBoxes[0].apexX + (oBoxes[0].x - oBoxes[0].apexX) / 2;
-    const labelY = CY + (Math.max(state.threats.length, state.outcomes.length, 1) * (BOX_H + BOX_GAP)) / 2 - BOX_GAP / 2;
+    const labelY = CY + (Math.max(state.threats.length, state.consequences.length, 1) * (BOX_H + BOX_GAP)) / 2 - BOX_GAP / 2;
     s += `<text x="${tx(recTrackX)}" y="${ty(labelY + 24)}" text-anchor="middle" dominant-baseline="central" font-size="${sv(9)}" font-family="system-ui,sans-serif" font-weight="700" letter-spacing="3" fill="rgba(248,113,113,0.55)">RECOVERY BARRIERS</text>`;
   }
 
@@ -1251,14 +1254,14 @@ function buildExportSVG(ox, oy, W, H, sc) {
     }
   });
 
-  // Outcome boxes
+  // Consequence boxes
   oBoxes.forEach(b => {
     const hasMeta = b.likelihood || b.severity || b.notes;
-    s += `<rect x="${tx(b.x)}" y="${ty(b.y)}" width="${sv(BOX_W)}" height="${sv(BOX_H)}" rx="${sv(9)}" fill="${COLORS.outcome.fill}" stroke="${COLORS.outcome.stroke}" stroke-width="${sv(1.5)}"/>`;
-    s += `<rect x="${(parseFloat(tx(b.x))+parseFloat(sv(BOX_W))-parseFloat(sv(4))).toFixed(2)}" y="${(parseFloat(ty(b.y))+parseFloat(sv(8))).toFixed(2)}" width="${sv(4)}" height="${sv(BOX_H-16)}" rx="${sv(2)}" fill="${COLORS.outcome.line}" opacity="0.7"/>`;
+    s += `<rect x="${tx(b.x)}" y="${ty(b.y)}" width="${sv(BOX_W)}" height="${sv(BOX_H)}" rx="${sv(9)}" fill="${COLORS.consequence.fill}" stroke="${COLORS.consequence.stroke}" stroke-width="${sv(1.5)}"/>`;
+    s += `<rect x="${(parseFloat(tx(b.x))+parseFloat(sv(BOX_W))-parseFloat(sv(4))).toFixed(2)}" y="${(parseFloat(ty(b.y))+parseFloat(sv(8))).toFixed(2)}" width="${sv(4)}" height="${sv(BOX_H-16)}" rx="${sv(2)}" fill="${COLORS.consequence.line}" opacity="0.7"/>`;
     if (hasMeta) {
       s += `<line x1="${tx(b.x+6)}" y1="${ty(b.y+DIVIDER_Y_OFFSET)}" x2="${tx(b.x+BOX_W-6)}" y2="${ty(b.y+DIVIDER_Y_OFFSET)}" stroke="rgba(0,0,0,0.08)" stroke-width="${sv(0.8)}"/>`;
-      s += expText(b.cx-2, b.y+LABEL_CY_OFFSET, b.label, 11.5, COLORS.outcome.text, BOX_W-10);
+      s += expText(b.cx-2, b.y+LABEL_CY_OFFSET, b.label, 11.5, COLORS.consequence.text, BOX_W-10);
       const hasBoth = b.likelihood && b.severity;
       if (hasBoth) {
         s += expChip(b.cx-43, b.y+CHIP_Y_OFFSET, b.likelihood, LIKELIHOOD_COLORS[b.likelihood] || '#888');
@@ -1269,7 +1272,7 @@ function buildExportSVG(ox, oy, W, H, sc) {
       }
       if (b.notes) s += expNotes(b.cx-2, b.y+NOTES_Y_OFFSET, b.notes);
     } else {
-      s += expText(b.cx-2, b.cy, b.label, 12.5, COLORS.outcome.text, BOX_W-10);
+      s += expText(b.cx-2, b.cy, b.label, 12.5, COLORS.consequence.text, BOX_W-10);
     }
   });
 
@@ -1302,9 +1305,9 @@ function escXML(str) {
 // CLEAR DIAGRAM
 // ═══════════════════════════════════════════════════════
 document.getElementById('btn-clear').addEventListener('click', () => {
-  if (!confirm('Clear all causes, consequences, and controls?\n\nThe hazard and top event will be kept. This cannot be undone.')) return;
+  if (!confirm('Clear all threats, consequences, and barriers?\n\nThe hazard and top event will be kept. This cannot be undone.')) return;
   state.threats  = [];
-  state.outcomes = [];
+  state.consequences = [];
   refreshSidebar();
   render();
 });
