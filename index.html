@@ -195,6 +195,71 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:fl
 }
 .btn-add:hover{border-color:var(--sb-accent);color:var(--sb-accent);background:rgba(91,142,240,0.04)}
 
+/* ── BARRIER TYPE ROW ────────────────────────────────── */
+.barrier-type-row{
+  display:flex;align-items:center;gap:5px;
+  padding-left:2px;
+}
+.barrier-type-dot{
+  width:8px;height:8px;border-radius:2px;flex-shrink:0;
+  transition:background 0.2s;
+}
+.barrier-type-label{
+  font-size:9.5px;color:var(--sb-muted);white-space:nowrap;
+  width:28px;flex-shrink:0;letter-spacing:0.02em;
+}
+.barrier-type-select{
+  flex:1;
+  background:rgba(20,24,36,0.5);
+  border:1px solid var(--sb-border2);
+  border-radius:5px;
+  padding:3px 6px;
+  font-size:10.5px;color:var(--sb-text);
+  outline:none;font-family:inherit;
+}
+.barrier-type-select:focus{border-color:var(--sb-accent)}
+.barrier-type-select option{background:var(--sb-surface2)}
+
+/* ── HOC LEGEND ──────────────────────────────────────── */
+#hoc-legend{
+  position:absolute;bottom:14px;left:14px;
+  background:rgba(255,255,255,0.93);
+  border:1px solid #e2e0da;
+  border-radius:9px;
+  padding:8px 11px 9px;
+  font-family:system-ui,-apple-system,sans-serif;
+  box-shadow:0 2px 10px rgba(0,0,0,0.09);
+  backdrop-filter:blur(6px);
+  pointer-events:none;
+  min-width:148px;
+}
+.hoc-legend-title{
+  font-size:8.5px;font-weight:700;letter-spacing:0.1em;
+  text-transform:uppercase;color:#777;margin-bottom:6px;
+}
+.hoc-legend-item{
+  display:flex;align-items:center;gap:7px;
+  margin-bottom:4px;
+}
+.hoc-legend-item:last-child{margin-bottom:0}
+.hoc-legend-swatch{
+  width:20px;height:13px;border-radius:2.5px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:800;letter-spacing:0.03em;color:white;
+}
+.hoc-legend-name{font-size:10px;color:#444;}
+  width:100%;margin-top:6px;
+  background:transparent;
+  border:1px dashed var(--sb-border2);
+  border-radius:7px;
+  padding:8px;
+  font-size:11.5px;font-family:inherit;
+  color:var(--sb-muted);
+  cursor:pointer;
+  transition:all 0.15s;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+
 .divider{height:2px;background:var(--sb-divider);margin:4px -16px 16px}
 
 #sidebar-footer{
@@ -284,16 +349,16 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:fl
   "topEventLikelihood": "Possible",
   "topEventNotes": "Based on historical incident data",
   "threats": [
-    { "label": "Valve Failure", "barriers": ["Routine Inspection", "Overpressure Cap"], "likelihood": "Unlikely", "notes": "Monthly inspection regime in place" },
-    { "label": "Operator Error", "barriers": ["Staff Training"], "likelihood": "Possible", "notes": "Human factors assessment underway" },
-    { "label": "Corrosion / Degradation", "barriers": ["Ultrasonic Testing"], "likelihood": "Rare", "notes": "" },
-    { "label": "Overpressure Event", "barriers": ["Burst Disc Setup"], "likelihood": "Rare", "notes": "" }
+    { "label": "Valve Failure", "barriers": [{"label":"Routine Inspection","type":"Administrative"},{"label":"Overpressure Cap","type":"Engineering"}], "likelihood": "Unlikely", "notes": "Monthly inspection regime in place" },
+    { "label": "Operator Error", "barriers": [{"label":"Staff Training","type":"Administrative"}], "likelihood": "Possible", "notes": "Human factors assessment underway" },
+    { "label": "Corrosion / Degradation", "barriers": [{"label":"Ultrasonic Testing","type":"Engineering"}], "likelihood": "Rare", "notes": "" },
+    { "label": "Overpressure Event", "barriers": [{"label":"Burst Disc Setup","type":"Engineering"}], "likelihood": "Rare", "notes": "" }
   ],
   "consequences": [
-    { "label": "Fire or Explosion", "barriers": ["Deluge System"], "likelihood": "Unlikely", "severity": "Catastrophic", "notes": "Fatality risk within 50m radius" },
-    { "label": "Toxic Gas Release", "barriers": ["Scrubber System", "PPE Zone"], "likelihood": "Possible", "severity": "Major", "notes": "" },
-    { "label": "Environmental Damage", "barriers": ["Bund Wall Catchment"], "likelihood": "Likely", "severity": "Moderate", "notes": "" },
-    { "label": "Personnel Injury", "barriers": ["Evacuation Plan"], "likelihood": "Unlikely", "severity": "Major", "notes": "" }
+    { "label": "Fire or Explosion", "barriers": [{"label":"Deluge System","type":"Engineering"}], "likelihood": "Unlikely", "severity": "Catastrophic", "notes": "Fatality risk within 50m radius" },
+    { "label": "Toxic Gas Release", "barriers": [{"label":"Scrubber System","type":"Engineering"},{"label":"PPE Zone","type":"PPE"}], "likelihood": "Possible", "severity": "Major", "notes": "" },
+    { "label": "Environmental Damage", "barriers": [{"label":"Bund Wall Catchment","type":"Engineering"}], "likelihood": "Likely", "severity": "Moderate", "notes": "" },
+    { "label": "Personnel Injury", "barriers": [{"label":"Evacuation Plan","type":"Administrative"}], "likelihood": "Unlikely", "severity": "Major", "notes": "" }
   ]
 }
 </script>
@@ -411,6 +476,30 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:fl
 
   <div id="status"></div>
   <div id="hint">Scroll to zoom &nbsp;·&nbsp; Middle-click or Space + drag to pan</div>
+
+  <div id="hoc-legend">
+    <div class="hoc-legend-title">Hierarchy of Controls</div>
+    <div class="hoc-legend-item">
+      <div class="hoc-legend-swatch" style="background:#16a34a">EL</div>
+      <span class="hoc-legend-name">Elimination</span>
+    </div>
+    <div class="hoc-legend-item">
+      <div class="hoc-legend-swatch" style="background:#65a30d">SB</div>
+      <span class="hoc-legend-name">Substitution</span>
+    </div>
+    <div class="hoc-legend-item">
+      <div class="hoc-legend-swatch" style="background:#0284c7">EG</div>
+      <span class="hoc-legend-name">Engineering</span>
+    </div>
+    <div class="hoc-legend-item">
+      <div class="hoc-legend-swatch" style="background:#d97706">AD</div>
+      <span class="hoc-legend-name">Administrative</span>
+    </div>
+    <div class="hoc-legend-item">
+      <div class="hoc-legend-swatch" style="background:#dc2626">PP</div>
+      <span class="hoc-legend-name">PPE</span>
+    </div>
+  </div>
 </main>
 
 <script>
@@ -436,6 +525,16 @@ const SEVERITY_COLORS = {
   'Catastrophic':  '#dc2626'
 };
 
+// ── HIERARCHY OF CONTROLS ─────────────────────────────
+const HOC_OPTIONS = ['Elimination', 'Substitution', 'Engineering', 'Administrative', 'PPE'];
+const HOC_CONFIG = {
+  'Elimination':    { abbr: 'EL', color: '#16a34a' },
+  'Substitution':   { abbr: 'SB', color: '#65a30d' },
+  'Engineering':    { abbr: 'EG', color: '#0284c7' },
+  'Administrative': { abbr: 'AD', color: '#d97706' },
+  'PPE':            { abbr: 'PP', color: '#dc2626' },
+};
+
 // ═══════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════
@@ -454,11 +553,13 @@ function normaliseState(s) {
   if (!s.topEventNotes)      s.topEventNotes      = '';
   s.threats.forEach(t => {
     if (!t.barriers)   t.barriers   = [];
+    t.barriers = t.barriers.map(b => typeof b === 'string' ? { label: b, type: '' } : b);
     if (t.likelihood === undefined) t.likelihood = '';
     if (!t.notes)      t.notes      = '';
   });
   s.consequences.forEach(o => {
     if (!o.barriers)   o.barriers   = [];
+    o.barriers = o.barriers.map(b => typeof b === 'string' ? { label: b, type: '' } : b);
     if (o.likelihood === undefined) o.likelihood = '';
     if (o.severity   === undefined) o.severity   = '';
     if (!o.notes)      o.notes      = '';
@@ -900,12 +1001,45 @@ function render() {
   saveState();
 }
 
-function renderBarrierBlock(cx, cy, label, accentColor) {
+function renderBarrierBlock(cx, cy, barrier, accentColor) {
+  const label = (barrier && typeof barrier === 'object') ? barrier.label : (barrier || '');
+  const type  = (barrier && typeof barrier === 'object') ? barrier.type  : '';
+  const hoc   = HOC_CONFIG[type];
+  const stripeColor = hoc ? hoc.color : accentColor;
+
   const x = cx - CTRL_W / 2, y = cy - CTRL_H / 2;
   const g = el('g');
-  g.appendChild(el('rect', { x, y, width:CTRL_W, height:CTRL_H, rx:5, fill:COLORS.barrier.fill, stroke:COLORS.barrier.stroke, 'stroke-width':'1.2' }));
-  g.appendChild(el('rect', { x, y, width:'3.5', height:CTRL_H, rx:'1.5', fill:accentColor }));
-  addText(g, cx + 2, cy, label, 10.5, COLORS.barrier.text, CTRL_W - 6);
+
+  // Main block
+  g.appendChild(el('rect', {
+    x, y, width: CTRL_W, height: CTRL_H, rx: 5,
+    fill: COLORS.barrier.fill,
+    stroke: hoc ? hoc.color : COLORS.barrier.stroke,
+    'stroke-width': hoc ? '1.6' : '1.2'
+  }));
+  // Left accent stripe
+  g.appendChild(el('rect', { x, y, width: '3.5', height: CTRL_H, rx: '1.5', fill: stripeColor }));
+
+  // HoC badge (top-right corner)
+  if (hoc) {
+    const badgeW = 20, badgeH = 11;
+    const bx = x + CTRL_W - badgeW - 2, by = y + 2;
+    g.appendChild(el('rect', { x: bx, y: by, width: badgeW, height: badgeH, rx: 2.5,
+      fill: hoc.color, opacity: '0.18' }));
+    g.appendChild(el('rect', { x: bx, y: by, width: badgeW, height: badgeH, rx: 2.5,
+      fill: 'none', stroke: hoc.color, 'stroke-width': '0.8', opacity: '0.7' }));
+    const bt = el('text', {
+      x: bx + badgeW / 2, y: by + badgeH / 2,
+      'text-anchor': 'middle', 'dominant-baseline': 'central',
+      'font-size': '7', 'font-family': "system-ui,-apple-system,sans-serif",
+      'font-weight': '800', fill: hoc.color
+    });
+    bt.textContent = hoc.abbr;
+    g.appendChild(bt);
+  }
+
+  // Label text
+  addText(g, cx + 2, cy + (hoc ? 2 : 0), label, 10.5, COLORS.barrier.text, CTRL_W - 6);
   wld.appendChild(g);
 }
 
@@ -1008,24 +1142,79 @@ function buildList(containerId, items, key) {
     ctrlContainer.className = 'barriers-container';
     if (!item.barriers) item.barriers = [];
     item.barriers.forEach((ctrl, cIdx) => {
+      // Wrap each barrier in a small container
+      const cWrap = document.createElement('div');
+      cWrap.style.cssText = 'display:flex;flex-direction:column;gap:2px;margin-bottom:4px;';
+
       const cRow = document.createElement('div');
       cRow.className = 'barrier-row';
+
+      // Apply left-border color based on HoC type
+      const applyHocStyle = (type) => {
+        const hoc = HOC_CONFIG[type];
+        cRow.style.borderLeft = hoc ? `3px solid ${hoc.color}` : '3px solid transparent';
+        cRow.style.paddingLeft = '4px';
+        cRow.style.borderRadius = '3px';
+      };
+      applyHocStyle(ctrl.type || '');
+
       const cInp = document.createElement('input');
-      cInp.type = 'text'; cInp.value = ctrl; cInp.placeholder = 'Barrier…';
-      cInp.addEventListener('input', () => { state[key][i].barriers[cIdx] = cInp.value; render(); });
+      cInp.type = 'text'; cInp.value = ctrl.label || ''; cInp.placeholder = 'Barrier…';
+      cInp.addEventListener('input', () => { state[key][i].barriers[cIdx].label = cInp.value; render(); });
+
       const cDel = document.createElement('button');
       cDel.className = 'btn-del';
       cDel.style.width = '20px'; cDel.style.height = '20px'; cDel.style.fontSize = '11px';
       cDel.innerHTML = '×';
       cDel.addEventListener('click', () => { state[key][i].barriers.splice(cIdx, 1); buildList(containerId, state[key], key); render(); });
+
       cRow.appendChild(cInp); cRow.appendChild(cDel);
-      ctrlContainer.appendChild(cRow);
+
+      // Type select row
+      const typeRow = document.createElement('div');
+      typeRow.className = 'barrier-type-row';
+
+      const typeDot = document.createElement('span');
+      typeDot.className = 'barrier-type-dot';
+      const currentHoc = HOC_CONFIG[ctrl.type];
+      typeDot.style.background = currentHoc ? currentHoc.color : 'var(--sb-border2)';
+
+      const typeLabel = document.createElement('span');
+      typeLabel.className = 'barrier-type-label';
+      typeLabel.textContent = 'Type';
+
+      const typeSel = document.createElement('select');
+      typeSel.className = 'barrier-type-select';
+      const blankOpt = document.createElement('option');
+      blankOpt.value = ''; blankOpt.textContent = '— unclassified —';
+      typeSel.appendChild(blankOpt);
+      HOC_OPTIONS.forEach(opt => {
+        const o = document.createElement('option');
+        o.value = opt; o.textContent = opt;
+        if (opt === (ctrl.type || '')) o.selected = true;
+        typeSel.appendChild(o);
+      });
+      typeSel.addEventListener('change', () => {
+        state[key][i].barriers[cIdx].type = typeSel.value;
+        const hoc = HOC_CONFIG[typeSel.value];
+        typeDot.style.background = hoc ? hoc.color : 'var(--sb-border2)';
+        applyHocStyle(typeSel.value);
+        render();
+      });
+
+      typeRow.appendChild(typeDot);
+      typeRow.appendChild(typeLabel);
+      typeRow.appendChild(typeSel);
+
+      cWrap.appendChild(cRow);
+      cWrap.appendChild(typeRow);
+      ctrlContainer.appendChild(cWrap);
     });
 
     const btnAddCtrl = document.createElement('button');
     btnAddCtrl.className = 'btn-add-ctrl';
     btnAddCtrl.innerHTML = `<span>+</span> Add ${key === 'threats' ? 'Preventative' : 'Recovery'} Barrier`;
-    btnAddCtrl.addEventListener('click', () => { state[key][i].barriers.push('New Barrier'); buildList(containerId, state[key], key); render(); });
+    btnAddCtrl.addEventListener('click', () => { state[key][i].barriers.push({ label: 'New Barrier', type: '' }); buildList(containerId, state[key], key); render(); });
 
     parentRow.appendChild(ctrlContainer);
     parentRow.appendChild(btnAddCtrl);
@@ -1191,14 +1380,24 @@ function buildExportSVG(ox, oy, W, H, sc) {
       const startX = b.x + BOX_W + END_BUFFER + CTRL_W / 2;
       b.barriers.forEach((ctrl, cIdx) => {
         const cx = startX + cIdx * (CTRL_W + CTRL_GAP);
-        s += `<rect x="${tx(cx - CTRL_W/2)}" y="${ty(b.cy - CTRL_H/2)}" width="${sv(CTRL_W)}" height="${sv(CTRL_H)}" rx="${sv(5)}" fill="${COLORS.barrier.fill}" stroke="${COLORS.barrier.stroke}" stroke-width="${sv(1.2)}"/>`;
-        s += `<rect x="${tx(cx - CTRL_W/2)}" y="${ty(b.cy - CTRL_H/2)}" width="${sv(3.5)}" height="${sv(CTRL_H)}" rx="${sv(1.5)}" fill="${COLORS.threat.stroke}"/>`;
-        s += expText(cx, b.cy, ctrl, 10.5, COLORS.barrier.text, CTRL_W - 6);
+        const barrierLabel = (ctrl && typeof ctrl === 'object') ? ctrl.label : (ctrl || '');
+        const barrierType  = (ctrl && typeof ctrl === 'object') ? ctrl.type  : '';
+        const hoc = HOC_CONFIG[barrierType];
+        const stripeColor = hoc ? hoc.color : COLORS.threat.stroke;
+        s += `<rect x="${tx(cx - CTRL_W/2)}" y="${ty(b.cy - CTRL_H/2)}" width="${sv(CTRL_W)}" height="${sv(CTRL_H)}" rx="${sv(5)}" fill="${COLORS.barrier.fill}" stroke="${hoc ? hoc.color : COLORS.barrier.stroke}" stroke-width="${sv(hoc ? 1.6 : 1.2)}"/>`;
+        s += `<rect x="${tx(cx - CTRL_W/2)}" y="${ty(b.cy - CTRL_H/2)}" width="${sv(3.5)}" height="${sv(CTRL_H)}" rx="${sv(1.5)}" fill="${stripeColor}"/>`;
+        if (hoc) {
+          const badgeW = 20, badgeH = 11;
+          const bx = cx + CTRL_W/2 - badgeW - 2, by = b.cy - CTRL_H/2 + 2;
+          const rc = parseInt(hoc.color.slice(1,3),16), gc = parseInt(hoc.color.slice(3,5),16), bc2 = parseInt(hoc.color.slice(5,7),16);
+          s += `<rect x="${tx(bx)}" y="${ty(by)}" width="${sv(badgeW)}" height="${sv(badgeH)}" rx="${sv(2.5)}" fill="rgba(${rc},${gc},${bc2},0.18)"/>`;
+          s += `<rect x="${tx(bx)}" y="${ty(by)}" width="${sv(badgeW)}" height="${sv(badgeH)}" rx="${sv(2.5)}" fill="none" stroke="${hoc.color}" stroke-width="${sv(0.8)}" opacity="0.7"/>`;
+          s += `<text x="${tx(bx+badgeW/2)}" y="${ty(by+badgeH/2)}" text-anchor="middle" dominant-baseline="central" font-size="${sv(7)}" font-family="system-ui,sans-serif" font-weight="800" fill="${hoc.color}">${hoc.abbr}</text>`;
+        }
+        s += expText(cx, b.cy + (hoc ? 2 : 0), barrierLabel, 10.5, COLORS.barrier.text, CTRL_W - 6);
       });
     }
   });
-
-  // Consequence lines & barriers
   oBoxes.forEach(b => {
     const e = circleEdge(b.apexX, b.cy, TE_R);
     s += `<path d="M${tx(e.x)} ${ty(e.y)} L${tx(b.apexX)} ${ty(b.cy)} H${tx(b.x)}" fill="none" stroke="${COLORS.consequence.line}" stroke-width="${sv(2)}" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#aO)"/>`;
@@ -1207,9 +1406,21 @@ function buildExportSVG(ox, oy, W, H, sc) {
       const startX = b.apexX + END_BUFFER + CTRL_W / 2;
       b.barriers.forEach((ctrl, cIdx) => {
         const cx = startX + cIdx * (CTRL_W + CTRL_GAP);
-        s += `<rect x="${tx(cx - CTRL_W/2)}" y="${ty(b.cy - CTRL_H/2)}" width="${sv(CTRL_W)}" height="${sv(CTRL_H)}" rx="${sv(5)}" fill="${COLORS.barrier.fill}" stroke="${COLORS.barrier.stroke}" stroke-width="${sv(1.2)}"/>`;
-        s += `<rect x="${tx(cx - CTRL_W/2)}" y="${ty(b.cy - CTRL_H/2)}" width="${sv(3.5)}" height="${sv(CTRL_H)}" rx="${sv(1.5)}" fill="${COLORS.consequence.stroke}"/>`;
-        s += expText(cx, b.cy, ctrl, 10.5, COLORS.barrier.text, CTRL_W - 6);
+        const barrierLabel = (ctrl && typeof ctrl === 'object') ? ctrl.label : (ctrl || '');
+        const barrierType  = (ctrl && typeof ctrl === 'object') ? ctrl.type  : '';
+        const hoc = HOC_CONFIG[barrierType];
+        const stripeColor = hoc ? hoc.color : COLORS.consequence.stroke;
+        s += `<rect x="${tx(cx - CTRL_W/2)}" y="${ty(b.cy - CTRL_H/2)}" width="${sv(CTRL_W)}" height="${sv(CTRL_H)}" rx="${sv(5)}" fill="${COLORS.barrier.fill}" stroke="${hoc ? hoc.color : COLORS.barrier.stroke}" stroke-width="${sv(hoc ? 1.6 : 1.2)}"/>`;
+        s += `<rect x="${tx(cx - CTRL_W/2)}" y="${ty(b.cy - CTRL_H/2)}" width="${sv(3.5)}" height="${sv(CTRL_H)}" rx="${sv(1.5)}" fill="${stripeColor}"/>`;
+        if (hoc) {
+          const badgeW = 20, badgeH = 11;
+          const bx = cx + CTRL_W/2 - badgeW - 2, by = b.cy - CTRL_H/2 + 2;
+          const rc = parseInt(hoc.color.slice(1,3),16), gc = parseInt(hoc.color.slice(3,5),16), bc2 = parseInt(hoc.color.slice(5,7),16);
+          s += `<rect x="${tx(bx)}" y="${ty(by)}" width="${sv(badgeW)}" height="${sv(badgeH)}" rx="${sv(2.5)}" fill="rgba(${rc},${gc},${bc2},0.18)"/>`;
+          s += `<rect x="${tx(bx)}" y="${ty(by)}" width="${sv(badgeW)}" height="${sv(badgeH)}" rx="${sv(2.5)}" fill="none" stroke="${hoc.color}" stroke-width="${sv(0.8)}" opacity="0.7"/>`;
+          s += `<text x="${tx(bx+badgeW/2)}" y="${ty(by+badgeH/2)}" text-anchor="middle" dominant-baseline="central" font-size="${sv(7)}" font-family="system-ui,sans-serif" font-weight="800" fill="${hoc.color}">${hoc.abbr}</text>`;
+        }
+        s += expText(cx, b.cy + (hoc ? 2 : 0), barrierLabel, 10.5, COLORS.barrier.text, CTRL_W - 6);
       });
     }
   });
