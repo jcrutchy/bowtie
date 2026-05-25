@@ -245,7 +245,7 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:fl
 .hoc-legend-swatch{
   width:20px;height:13px;border-radius:2.5px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  font-size:9px;font-weight:800;letter-spacing:0.03em;color:white;
+  font-size:9px;font-weight:800;letter-spacing:0.03em;
 }
 .hoc-legend-name{font-size:10px;color:#444;}
   width:100%;margin-top:6px;
@@ -480,23 +480,23 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:fl
   <div id="hoc-legend">
     <div class="hoc-legend-title">Hierarchy of Controls</div>
     <div class="hoc-legend-item">
-      <div class="hoc-legend-swatch" style="background:#16a34a">EL</div>
+      <div class="hoc-legend-swatch" style="color:#16a34a; border: 1px solid #16a34a; background-color:color-mix(in srgb, #16a34a, white 80%);">EL</div>
       <span class="hoc-legend-name">Elimination</span>
     </div>
     <div class="hoc-legend-item">
-      <div class="hoc-legend-swatch" style="background:#65a30d">SB</div>
+      <div class="hoc-legend-swatch" style="color:#65a30d; border: 1px solid #65a30d; background-color:color-mix(in srgb, #65a30d, white 80%);">SB</div>
       <span class="hoc-legend-name">Substitution</span>
     </div>
     <div class="hoc-legend-item">
-      <div class="hoc-legend-swatch" style="background:#0284c7">EG</div>
+      <div class="hoc-legend-swatch" style="color:#0284c7; border: 1px solid #0284c7; background-color:color-mix(in srgb, #0284c7, white 80%);">EG</div>
       <span class="hoc-legend-name">Engineering</span>
     </div>
     <div class="hoc-legend-item">
-      <div class="hoc-legend-swatch" style="background:#d97706">AD</div>
+      <div class="hoc-legend-swatch" style="color:#d97706; border: 1px solid #d97706; background-color:color-mix(in srgb, #d97706, white 80%);">AD</div>
       <span class="hoc-legend-name">Administrative</span>
     </div>
     <div class="hoc-legend-item">
-      <div class="hoc-legend-swatch" style="background:#dc2626">PP</div>
+      <div class="hoc-legend-swatch" style="color:#dc2626; border: 1px solid #dc2626; background-color:color-mix(in srgb, #dc2626, white 80%);">PP</div>
       <span class="hoc-legend-name">PPE</span>
     </div>
   </div>
@@ -1005,7 +1005,8 @@ function renderBarrierBlock(cx, cy, barrier, accentColor) {
   const label = (barrier && typeof barrier === 'object') ? barrier.label : (barrier || '');
   const type  = (barrier && typeof barrier === 'object') ? barrier.type  : '';
   const hoc   = HOC_CONFIG[type];
-  const stripeColor = hoc ? hoc.color : accentColor;
+  //const stripeColor = hoc ? hoc.color : accentColor;
+  const stripeColor = accentColor;
 
   const x = cx - CTRL_W / 2, y = cy - CTRL_H / 2;
   const g = el('g');
@@ -1014,7 +1015,8 @@ function renderBarrierBlock(cx, cy, barrier, accentColor) {
   g.appendChild(el('rect', {
     x, y, width: CTRL_W, height: CTRL_H, rx: 5,
     fill: COLORS.barrier.fill,
-    stroke: hoc ? hoc.color : COLORS.barrier.stroke,
+    //stroke: hoc ? hoc.color : COLORS.barrier.stroke,
+    stroke: COLORS.barrier.stroke,
     'stroke-width': hoc ? '1.6' : '1.2'
   }));
   // Left accent stripe
