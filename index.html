@@ -824,6 +824,20 @@ function render() {
   makeMarker(defs, 'arr-t', COLORS.threat.line);
   makeMarker(defs, 'arr-o', COLORS.consequence.line);
   makeMarker(defs, 'arr-h', '#a78bfa');
+
+const pattern = el('pattern', {
+  id: 'hazard-stripes',
+  width: '20',
+  height: '20',
+  patternUnits: 'userSpaceOnUse',
+  patternTransform: 'rotate(45)'
+});
+// A solid yellow background for the pattern
+pattern.appendChild(el('rect', { width: '20', height: '20', fill: COLORS.hazard.fill }));
+// A dark charcoal/grey stripe (subtle, not stark black)
+pattern.appendChild(el('rect', { x: '0', y: '0', width: '10', height: '20', fill: 'rgba(40, 40, 40, 0.15)' })); 
+defs.appendChild(pattern);
+
   wld.appendChild(defs);
 
   const tBoxes = boxPositions(state.threats, true);
@@ -966,7 +980,7 @@ function render() {
   });
 
   // ── Hazard box ──────────────────────────────────────
-  {
+  /*{
     const g = el('g');
     g.appendChild(el('rect', { x:HAZ_X - 4, y:HAZ_Y - 4, width:HAZ_W + 8, height:HAZ_H + 8, rx:'14', fill:'rgba(253,224,71,0.15)' }));
     g.appendChild(el('rect', { x:HAZ_X, y:HAZ_Y, width:HAZ_W, height:HAZ_H, rx:'10', fill:COLORS.hazard.fill, stroke:COLORS.hazard.stroke, 'stroke-width':'2' }));
@@ -975,7 +989,51 @@ function render() {
     wld.appendChild(lbl);
     addText(g, CX, HAZ_Y + HAZ_H/2, state.hazard, 13, COLORS.hazard.text, HAZ_W);
     wld.appendChild(g);
-  }
+  }*/
+
+{
+  const g = el('g');
+  
+  // 1. The Outer Hazard Frame (Now featuring the diagonal stripes!)
+  g.appendChild(el('rect', { 
+    x: HAZ_X - 6, 
+    y: HAZ_Y - 6, 
+    width: HAZ_W + 12, 
+    height: HAZ_H + 12, 
+    rx: '14', 
+    fill: 'url(#hazard-stripes)' // <-- Applies the pattern
+  }));
+  
+  // 2. The Inner Solid Box (Protects text readability)
+  g.appendChild(el('rect', { 
+    x: HAZ_X, 
+    y: HAZ_Y, 
+    width: HAZ_W, 
+    height: HAZ_H, 
+    rx: '10', 
+    fill: COLORS.hazard.fill, 
+    stroke: COLORS.hazard.stroke, 
+    'stroke-width': '2' 
+  }));
+  
+  // 3. Labels and Text
+  const lbl = el('text', { 
+    x: CX, 
+    y: HAZ_Y - 12, 
+    'text-anchor': 'middle', 
+    'dominant-baseline': 'central', 
+    'font-size': '9', 
+    'font-family': "system-ui,sans-serif", 
+    'font-weight': '700', 
+    'letter-spacing': '3', 
+    fill: 'rgba(161,97,0,0.6)' 
+  });
+  lbl.textContent = 'HAZARD';
+  wld.appendChild(lbl);
+  
+  addText(g, CX, HAZ_Y + HAZ_H/2, state.hazard, 13, COLORS.hazard.text, HAZ_W);
+  wld.appendChild(g);
+}
 
   // ── Top Event circle ────────────────────────────────
   {
