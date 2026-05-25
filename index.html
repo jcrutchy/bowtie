@@ -1040,7 +1040,7 @@ defs.appendChild(pattern);
     const g = el('g');
     g.appendChild(el('circle', { cx:CX, cy:CY, r:TE_R + 8, fill:'rgba(167,139,250,0.09)' }));
     g.appendChild(el('circle', { cx:CX, cy:CY, r:TE_R, fill:COLORS.te.fill, stroke:COLORS.te.stroke, 'stroke-width':'2' }));
-    const lbl = el('text', { x:CX, y:CY - TE_R - 13, 'text-anchor':'middle', 'dominant-baseline':'central', 'font-size':'9', 'font-family':"system-ui,sans-serif", 'font-weight':'700', 'letter-spacing':'3', fill:'rgba(124,58,237,0.55)' });
+    const lbl = el('text', { x:CX, y:CY + TE_R + 13, 'text-anchor':'middle', 'dominant-baseline':'central', 'font-size':'9', 'font-family':"system-ui,sans-serif", 'font-weight':'700', 'letter-spacing':'3', fill:'rgba(124,58,237,0.55)' });
     lbl.textContent = 'TOP EVENT';
     g.appendChild(lbl);
 
