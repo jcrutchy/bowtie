@@ -346,19 +346,19 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:fl
 {
   "hazard": "Pressurised Gas Cylinder",
   "topEvent": "Loss of Containment",
-  "topEventLikelihood": "Occasional",
+  "topEventLikelihood": "Occasional [3]",
   "topEventNotes": "Based on historical incident data",
   "threats": [
-    { "label": "Valve Failure", "barriers": [{"label":"Routine Inspection","type":"Administrative"},{"label":"Overpressure Cap","type":"Engineering"}], "likelihood": "Improbable", "notes": "Monthly inspection regime in place" },
-    { "label": "Operator Error", "barriers": [{"label":"Staff Training","type":"Administrative"}], "likelihood": "Occasional", "notes": "Human factors assessment underway" },
-    { "label": "Corrosion / Degradation", "barriers": [{"label":"Ultrasonic Testing","type":"Engineering"}], "likelihood": "Rare", "notes": "" },
-    { "label": "Overpressure Event", "barriers": [{"label":"Burst Disc Setup","type":"Engineering"}], "likelihood": "Rare", "notes": "" }
+    { "label": "Valve Failure", "barriers": [{"label":"Routine Inspection","type":"Administrative"},{"label":"Overpressure Cap","type":"Engineering"}], "likelihood": "Improbable [2] [4]", "notes": "Monthly inspection regime in place" },
+    { "label": "Operator Error", "barriers": [{"label":"Staff Training","type":"Administrative"}], "likelihood": "Occasional [3]", "notes": "Human factors assessment underway" },
+    { "label": "Corrosion / Degradation", "barriers": [{"label":"Ultrasonic Testing","type":"Engineering"}], "likelihood": "Rare [1]", "notes": "" },
+    { "label": "Overpressure Event", "barriers": [{"label":"Burst Disc Setup","type":"Engineering"}], "likelihood": "Rare [1]", "notes": "" }
   ],
   "consequences": [
-    { "label": "Fire or Explosion", "barriers": [{"label":"Deluge System","type":"Engineering"}], "likelihood": "Improbable", "severity": "Catastrophic", "notes": "Fatality risk within 50m radius" },
-    { "label": "Toxic Gas Release", "barriers": [{"label":"Scrubber System","type":"Engineering"},{"label":"PPE Zone","type":"PPE"}], "likelihood": "Occasional", "severity": "Critical", "notes": "" },
-    { "label": "Environmental Damage", "barriers": [{"label":"Bund Wall Catchment","type":"Engineering"}], "likelihood": "Probable", "severity": "Major", "notes": "" },
-    { "label": "Personnel Injury", "barriers": [{"label":"Evacuation Plan","type":"Administrative"}], "likelihood": "Improbable", "severity": "Critical", "notes": "" }
+    { "label": "Fire or Explosion", "barriers": [{"label":"Deluge System","type":"Engineering"}], "likelihood": "Improbable [2] [4]", "severity": "Catastrophic [E]", "notes": "Fatality risk within 50m radius" },
+    { "label": "Toxic Gas Release", "barriers": [{"label":"Scrubber System","type":"Engineering"},{"label":"PPE Zone","type":"PPE"}], "likelihood": "Occasional [3]", "severity": "Critical [D]", "notes": "" },
+    { "label": "Environmental Damage", "barriers": [{"label":"Bund Wall Catchment","type":"Engineering"}], "likelihood": "Probable [4]", "severity": "Major [C]", "notes": "" },
+    { "label": "Personnel Injury", "barriers": [{"label":"Evacuation Plan","type":"Administrative"}], "likelihood": "Improbable [2] [4]", "severity": "Critical [D]", "notes": "" }
   ]
 }
 </script>
@@ -511,23 +511,23 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:fl
 // CONFIGURABLE LISTS — edit these to customise dropdowns
 // currently configured for Australian Defence Harmonised Risk Matrix
 // ═══════════════════════════════════════════════════════
-const LIKELIHOOD_OPTIONS = ['Eliminated','Rare', 'Improbable', 'Occasional', 'Probable', 'Almost Certain'];
-const SEVERITY_OPTIONS   = ['Minor', 'Moderate', 'Major', 'Critical', 'Catastrophic'];
+const LIKELIHOOD_OPTIONS = ['Eliminated [0]','Rare [1]', 'Improbable [2] [4]', 'Occasional [3]', 'Probable [4]', 'Almost Certain [5]'];
+const SEVERITY_OPTIONS   = ['Minor [A]', 'Moderate [B]', 'Major [C]', 'Critical [D]', 'Catastrophic [E]'];
 
 // Colours mapped to each option value (customise freely)
 const LIKELIHOOD_COLORS = {
-  'Rare':            '#22c55e',
-  'Improbable':      '#84cc16',
-  'Occasional':      '#eab308',
-  'Probable':        '#f97316',
-  'Almost Certain':  '#ef4444'
+  'Rare [1]':            '#22c55e',
+  'Improbable [2] [4]':      '#84cc16',
+  'Occasional [3]':      '#eab308',
+  'Probable [4]':        '#f97316',
+  'Almost Certain [5]':  '#ef4444'
 };
 const SEVERITY_COLORS = {
-  'Minor':          '#6b7280',
-  'Moderate':       '#22c55e',
-  'Major':          '#eab308',
-  'Critical':       '#f97316',
-  'Catastrophic':   '#dc2626'
+  'Minor [A]':          '#6b7280',
+  'Moderate [B]':       '#22c55e',
+  'Major [C]':          '#eab308',
+  'Critical [D]':       '#f97316',
+  'Catastrophic [E]':   '#dc2626'
 };
 
 // ── HIERARCHY OF CONTROLS ─────────────────────────────
