@@ -346,19 +346,19 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:fl
 {
   "hazard": "Pressurised Gas Cylinder",
   "topEvent": "Loss of Containment",
-  "topEventLikelihood": "Possible",
+  "topEventLikelihood": "Occasional",
   "topEventNotes": "Based on historical incident data",
   "threats": [
-    { "label": "Valve Failure", "barriers": [{"label":"Routine Inspection","type":"Administrative"},{"label":"Overpressure Cap","type":"Engineering"}], "likelihood": "Unlikely", "notes": "Monthly inspection regime in place" },
-    { "label": "Operator Error", "barriers": [{"label":"Staff Training","type":"Administrative"}], "likelihood": "Possible", "notes": "Human factors assessment underway" },
+    { "label": "Valve Failure", "barriers": [{"label":"Routine Inspection","type":"Administrative"},{"label":"Overpressure Cap","type":"Engineering"}], "likelihood": "Improbable", "notes": "Monthly inspection regime in place" },
+    { "label": "Operator Error", "barriers": [{"label":"Staff Training","type":"Administrative"}], "likelihood": "Occasional", "notes": "Human factors assessment underway" },
     { "label": "Corrosion / Degradation", "barriers": [{"label":"Ultrasonic Testing","type":"Engineering"}], "likelihood": "Rare", "notes": "" },
     { "label": "Overpressure Event", "barriers": [{"label":"Burst Disc Setup","type":"Engineering"}], "likelihood": "Rare", "notes": "" }
   ],
   "consequences": [
-    { "label": "Fire or Explosion", "barriers": [{"label":"Deluge System","type":"Engineering"}], "likelihood": "Unlikely", "severity": "Catastrophic", "notes": "Fatality risk within 50m radius" },
-    { "label": "Toxic Gas Release", "barriers": [{"label":"Scrubber System","type":"Engineering"},{"label":"PPE Zone","type":"PPE"}], "likelihood": "Possible", "severity": "Major", "notes": "" },
-    { "label": "Environmental Damage", "barriers": [{"label":"Bund Wall Catchment","type":"Engineering"}], "likelihood": "Likely", "severity": "Moderate", "notes": "" },
-    { "label": "Personnel Injury", "barriers": [{"label":"Evacuation Plan","type":"Administrative"}], "likelihood": "Unlikely", "severity": "Major", "notes": "" }
+    { "label": "Fire or Explosion", "barriers": [{"label":"Deluge System","type":"Engineering"}], "likelihood": "Improbable", "severity": "Catastrophic", "notes": "Fatality risk within 50m radius" },
+    { "label": "Toxic Gas Release", "barriers": [{"label":"Scrubber System","type":"Engineering"},{"label":"PPE Zone","type":"PPE"}], "likelihood": "Occasional", "severity": "Critical", "notes": "" },
+    { "label": "Environmental Damage", "barriers": [{"label":"Bund Wall Catchment","type":"Engineering"}], "likelihood": "Probable", "severity": "Major", "notes": "" },
+    { "label": "Personnel Injury", "barriers": [{"label":"Evacuation Plan","type":"Administrative"}], "likelihood": "Improbable", "severity": "Critical", "notes": "" }
   ]
 }
 </script>
@@ -488,6 +488,10 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:fl
       <span class="hoc-legend-name">Substitution</span>
     </div>
     <div class="hoc-legend-item">
+      <div class="hoc-legend-swatch" style="color:#0284c7; border: 1px solid #0284c7; background-color:color-mix(in srgb, #0284c7, white 80%);">IS</div>
+      <span class="hoc-legend-name">Isolation</span>
+    </div>
+    <div class="hoc-legend-item">
       <div class="hoc-legend-swatch" style="color:#0284c7; border: 1px solid #0284c7; background-color:color-mix(in srgb, #0284c7, white 80%);">EG</div>
       <span class="hoc-legend-name">Engineering</span>
     </div>
@@ -505,31 +509,33 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:fl
 <script>
 // ═══════════════════════════════════════════════════════
 // CONFIGURABLE LISTS — edit these to customise dropdowns
+// currently configured for Australian Defence Harmonised Risk Matrix
 // ═══════════════════════════════════════════════════════
-const LIKELIHOOD_OPTIONS = ['Rare', 'Unlikely', 'Possible', 'Likely', 'Almost Certain'];
-const SEVERITY_OPTIONS   = ['Negligible', 'Minor', 'Moderate', 'Major', 'Catastrophic'];
+const LIKELIHOOD_OPTIONS = ['Eliminated','Rare', 'Improbable', 'Occasional', 'Probable', 'Almost Certain'];
+const SEVERITY_OPTIONS   = ['Minor', 'Moderate', 'Major', 'Critical', 'Catastrophic'];
 
 // Colours mapped to each option value (customise freely)
 const LIKELIHOOD_COLORS = {
-  'Rare':           '#22c55e',
-  'Unlikely':       '#84cc16',
-  'Possible':       '#eab308',
-  'Likely':         '#f97316',
-  'Almost Certain': '#ef4444'
+  'Rare':            '#22c55e',
+  'Improbable':      '#84cc16',
+  'Occasional':      '#eab308',
+  'Probable':        '#f97316',
+  'Almost Certain':  '#ef4444'
 };
 const SEVERITY_COLORS = {
-  'Negligible':    '#6b7280',
-  'Minor':         '#22c55e',
-  'Moderate':      '#eab308',
-  'Major':         '#f97316',
-  'Catastrophic':  '#dc2626'
+  'Minor':          '#6b7280',
+  'Moderate':       '#22c55e',
+  'Major':          '#eab308',
+  'Critical':       '#f97316',
+  'Catastrophic':   '#dc2626'
 };
 
 // ── HIERARCHY OF CONTROLS ─────────────────────────────
-const HOC_OPTIONS = ['Elimination', 'Substitution', 'Engineering', 'Administrative', 'PPE'];
+const HOC_OPTIONS = ['Elimination', 'Substitution', 'Isolation', 'Engineering', 'Administrative', 'PPE'];
 const HOC_CONFIG = {
   'Elimination':    { abbr: 'EL', color: '#16a34a' },
   'Substitution':   { abbr: 'SB', color: '#65a30d' },
+  'Isolation':      { abbr: 'IS', color: '#0284c7' },
   'Engineering':    { abbr: 'EG', color: '#0284c7' },
   'Administrative': { abbr: 'AD', color: '#d97706' },
   'PPE':            { abbr: 'PP', color: '#dc2626' },
